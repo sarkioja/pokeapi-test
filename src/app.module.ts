@@ -8,6 +8,7 @@ import { ApiKeyGuard } from './shared/guards/api-key.guard';
 import { TrainerModule } from './presentation/trainer/trainer.module';
 import { TeamModule } from './presentation/team/team.module';
 import { PokemonModule } from './presentation/pokemon/pokemon.module';
+import { HealthModule } from './presentation/health/health.module';
 import { ViaCepModule } from './infrastructure/http-clients/viacep/viacep.module';
 
 @Module({
@@ -23,6 +24,7 @@ import { ViaCepModule } from './infrastructure/http-clients/viacep/viacep.module
     TrainerModule,
     TeamModule,
     PokemonModule,
+    HealthModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },
