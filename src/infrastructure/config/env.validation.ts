@@ -10,6 +10,7 @@ export const envValidationSchema = Joi.object({
   DB_USERNAME: Joi.string().optional(),
   DB_PASSWORD: Joi.string().optional(),
   DB_NAME: Joi.string().optional(),
+  DB_SCHEMA: Joi.string().optional(),
 
   POKEAPI_BASE_URL: Joi.string().uri().default('https://pokeapi.co/api/v2'),
   POKEMON_TTL_HOURS: Joi.number().default(24),

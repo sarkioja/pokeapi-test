@@ -8,6 +8,7 @@ export interface DbEnv {
   username?: string;
   password?: string;
   database?: string;
+  schema?: string;
   nodeEnv?: string;
   logging?: boolean;
 }
@@ -27,6 +28,7 @@ export function buildBaseDataSourceOptions(
     synchronize: false as const,
     migrationsRun: false as const,
     logging,
+    ...(env.schema ? { extra: { options: `-c search_path=${env.schema},public` } } : {}),
     entities: [join(basePath, 'typeorm/entities/**/*.orm-entity{.ts,.js}')],
     migrations: [join(basePath, 'typeorm/migrations/**/*{.ts,.js}')],
   };

@@ -3,6 +3,8 @@ import type { Config } from 'jest';
 const config: Config = {
   moduleFileExtensions: ['js', 'json', 'ts'],
   rootDir: '.',
+  globalSetup: '<rootDir>/test/global-setup.ts',
+  setupFiles: ['<rootDir>/test/setup-test-env.ts'],
   testTimeout: 15000,
   testRegex: './test/e2e/.*\\.e2e-spec\\.ts$',
   transform: {
