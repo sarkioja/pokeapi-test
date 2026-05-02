@@ -18,7 +18,9 @@ async function bootstrap() {
     throw new Error('API_KEYS environment variable is required and cannot be empty');
   }
 
-  app.use(helmet());
+  app.use(helmet({
+    hsts: false, // HSTS is managed at the load-balancer level (Render); disabling avoids Safari caching localhost as HTTPS-only
+  }));
 
   const corsOrigins = config.get<string>('CORS_ORIGINS', 'http://localhost:3000');
   app.enableCors({
