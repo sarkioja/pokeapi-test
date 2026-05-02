@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { TeamController } from './team.controller';
 import { TeamOrmEntity } from '../../infrastructure/database/typeorm/entities/team.orm-entity';
 import { TrainerOrmEntity } from '../../infrastructure/database/typeorm/entities/trainer.orm-entity';
 import { PokemonOrmEntity } from '../../infrastructure/database/typeorm/entities/pokemon.orm-entity';
@@ -23,6 +24,7 @@ import { AnalyzeTeamTypesUseCase } from '../../application/team/use-cases/analyz
 
 @Module({
   imports: [TypeOrmModule.forFeature([TeamOrmEntity, TrainerOrmEntity, PokemonOrmEntity, PokemonTypeOrmEntity])],
+  controllers: [TeamController],
   providers: [
     { provide: TEAM_REPOSITORY, useClass: TeamTypeOrmRepository },
     { provide: TRAINER_REPOSITORY, useClass: TrainerTypeOrmRepository },
