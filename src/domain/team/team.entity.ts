@@ -7,7 +7,7 @@ export class Team {
     public readonly id: string,
     public name: string,
     public status: TeamStatus,
-    public readonly trainerId: string,
+    public readonly trainerId: string | null,
     public pokemon: TeamPokemon[],
     public readonly createdAt: Date,
     public updatedAt: Date,

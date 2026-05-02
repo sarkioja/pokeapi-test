@@ -1,4 +1,5 @@
 import { Trainer } from './trainer.entity';
+import { AddressData } from '../shared/address-data';
 
 export interface CreateTrainerData {
   name: string;
@@ -10,14 +11,6 @@ export interface UpdateTrainerData {
   name?: string;
   email?: string;
   favoritePokeapiId?: number;
-}
-
-export interface AddressData {
-  cep: string;
-  street: string;
-  neighborhood: string;
-  city: string;
-  state: string;
 }
 
 export interface TrainerPage {

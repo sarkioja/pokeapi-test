@@ -1,4 +1,4 @@
-import { AddressData } from '../trainer/trainer.repository.port';
+import { AddressData } from '../shared/address-data';
 
 export const VIACEP_PORT = 'VIACEP_PORT';
 
