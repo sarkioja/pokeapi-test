@@ -21,6 +21,7 @@
     "test:unit": "jest --config jest.config.ts --testPathPattern=\"src/\" --passWithNoTests",
     "test:watch": "jest --config jest.config.ts --watch",
     "test:cov": "jest --config jest.config.ts --coverage",
+    "test:integration": "jest --config jest.integration.config.ts --runInBand --passWithNoTests",
     "test:e2e": "jest --config jest.e2e.config.ts --runInBand",
     "migration:generate": "typeorm-ts-node-commonjs -d src/infrastructure/database/data-source.ts migration:generate",
     "migration:run": "typeorm-ts-node-commonjs -d src/infrastructure/database/data-source.ts migration:run",
