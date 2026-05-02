@@ -12,6 +12,7 @@ import { TeamFullException } from '../../domain/exceptions/team-full.exception';
 import { DuplicatePokemonException } from '../../domain/exceptions/duplicate-pokemon.exception';
 import { TeamArchivedException } from '../../domain/exceptions/team-archived.exception';
 import { InvalidCepException } from '../../domain/exceptions/invalid-cep.exception';
+import { EmailConflictException } from '../../domain/exceptions/email-conflict.exception';
 import {
   ExternalServiceException,
   CepNotFoundExternalException,
@@ -54,6 +55,9 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     }
     if (exception instanceof DuplicatePokemonException) {
       return { status: 409, error: 'DUPLICATE_POKEMON', message: exception.message };
+    }
+    if (exception instanceof EmailConflictException) {
+      return { status: 409, error: 'EMAIL_CONFLICT', message: exception.message };
     }
     if (exception instanceof TeamArchivedException) {
       return { status: 422, error: 'TEAM_ARCHIVED', message: exception.message };

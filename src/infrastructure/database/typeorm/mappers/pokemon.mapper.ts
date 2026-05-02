@@ -2,7 +2,6 @@ import { Pokemon } from '../../../../domain/pokemon/pokemon.entity';
 import { PokemonType } from '../../../../domain/pokemon/pokemon-type.entity';
 import { PokemonOrmEntity } from '../entities/pokemon.orm-entity';
 import { PokemonTypeOrmEntity } from '../entities/pokemon-type.orm-entity';
-import { DamageRelations } from '../../../../domain/pokemon/pokemon-type.entity';
 
 export class PokemonMapper {
   static toDomain(orm: PokemonOrmEntity): Pokemon {
@@ -25,7 +24,7 @@ export class PokemonMapper {
     return new PokemonType(
       orm.id,
       orm.typeName,
-      orm.damageRelations as DamageRelations,
+      orm.damageRelations,
       orm.fetchedAt,
     );
   }

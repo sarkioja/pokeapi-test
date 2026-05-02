@@ -23,6 +23,7 @@ export const TRAINER_REPOSITORY = 'TRAINER_REPOSITORY';
 export interface TrainerRepositoryPort {
   create(data: CreateTrainerData): Promise<Trainer>;
   findById(id: string): Promise<Trainer | null>;
+  findWithDeletedById(id: string): Promise<Trainer | null>;
   findByEmail(email: string): Promise<Trainer | null>;
   findAll(limit: number, offset: number): Promise<TrainerPage>;
   update(id: string, data: UpdateTrainerData): Promise<Trainer>;
