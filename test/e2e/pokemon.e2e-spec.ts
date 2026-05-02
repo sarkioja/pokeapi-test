@@ -5,6 +5,7 @@ import { DataSource } from 'typeorm';
 import { AppModule } from '../../src/app.module';
 import { ValidationPipe } from '../../src/shared/pipes/validation.pipe';
 import { GlobalExceptionFilter } from '../../src/shared/filters/global-exception.filter';
+import { POKEAPI_PORT, PokeApiPort } from '../../src/domain/ports/pokeapi.port';
 
 const API_KEY = 'e2e-test-key';
 const BASE = '/api/v1/pokemon';
@@ -90,13 +91,16 @@ describe('Pokemon (E2E)', () => {
       await request(app.getHttpServer())
         .get(`${BASE}/pikachu`).set('X-API-Key', API_KEY);
 
-      // Second call should serve from cache (fresh TTL)
+      const pokeApi = app.get<PokeApiPort>(POKEAPI_PORT);
+      const spy = jest.spyOn(pokeApi, 'fetchPokemonByName');
+
       const res = await request(app.getHttpServer())
         .get(`${BASE}/pikachu`)
         .set('X-API-Key', API_KEY)
         .expect(200);
 
       expect(res.body.name).toBe('pikachu');
+      expect(spy).not.toHaveBeenCalled();
     }, 15000);
 
     it('returns 404 for non-existent pokemon name', async () => {

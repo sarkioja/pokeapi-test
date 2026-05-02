@@ -77,4 +77,12 @@ describe('EnrichTrainerCepUseCase', () => {
 
     expect(viaCep.lookup).toHaveBeenCalledWith('01310100');
   });
+
+  it('propagates error when ViaCEP cannot find the CEP', async () => {
+    repo.findById.mockResolvedValue(makeTrainer());
+    viaCep.lookup.mockRejectedValue(new Error('CEP not found'));
+
+    await expect(useCase.execute('id-1', '00000000')).rejects.toThrow('CEP not found');
+    expect(repo.updateAddress).not.toHaveBeenCalled();
+  });
 });
