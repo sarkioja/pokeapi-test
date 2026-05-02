@@ -1,0 +1,22 @@
+meta {
+  name: Enrich Trainer CEP
+  type: http
+  seq: 5
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/trainers/{{trainerId}}/cep
+  body: json
+  auth: none
+}
+
+headers {
+  X-API-Key: {{apiKey}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "cep": "01310100"
+  }
+}

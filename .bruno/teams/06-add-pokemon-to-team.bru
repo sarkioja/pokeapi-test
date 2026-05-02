@@ -1,0 +1,23 @@
+meta {
+  name: Add Pokemon to Team
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/api/v1/teams/{{teamId}}/pokemon
+  body: json
+  auth: none
+}
+
+headers {
+  X-API-Key: {{apiKey}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "pokemonName": "{{pokemonName}}",
+    "nickname": "Pika"
+  }
+}

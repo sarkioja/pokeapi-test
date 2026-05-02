@@ -4,7 +4,7 @@ export const envValidationSchema = Joi.object({
   NODE_ENV: Joi.string().valid('development', 'production', 'test').default('development'),
   PORT: Joi.number().default(3000),
 
-  DATABASE_URL: Joi.string().uri().optional(),
+  DATABASE_URL: Joi.string().uri().optional().allow(''),
   DB_HOST: Joi.string().optional(),
   DB_PORT: Joi.number().default(5432),
   DB_USERNAME: Joi.string().optional(),
@@ -23,8 +23,8 @@ export const envValidationSchema = Joi.object({
   LOG_LEVEL: Joi.string().valid('debug', 'info', 'warn', 'error').default('info'),
 }).custom((value, helpers) => {
   if (!value.DATABASE_URL && (!value.DB_HOST || !value.DB_USERNAME || !value.DB_PASSWORD || !value.DB_NAME)) {
-    return helpers.error('any.invalid', {
-      message: 'Either DATABASE_URL or DB_HOST/DB_USERNAME/DB_PASSWORD/DB_NAME must be provided',
+    return helpers.message({
+      custom: 'Either DATABASE_URL or DB_HOST/DB_USERNAME/DB_PASSWORD/DB_NAME must be provided',
     });
   }
   return value;

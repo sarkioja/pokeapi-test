@@ -1,0 +1,23 @@
+meta {
+  name: Update Trainer
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/trainers/{{trainerId}}
+  body: json
+  auth: none
+}
+
+headers {
+  X-API-Key: {{apiKey}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Ash Ketchum Updated",
+    "favoritePokeapiId": 6
+  }
+}

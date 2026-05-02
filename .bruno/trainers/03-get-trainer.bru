@@ -1,0 +1,15 @@
+meta {
+  name: Get Trainer by ID
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/v1/trainers/{{trainerId}}
+  body: none
+  auth: none
+}
+
+headers {
+  X-API-Key: {{apiKey}}
+}

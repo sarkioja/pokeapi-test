@@ -17,6 +17,6 @@ import { PokemonController } from './pokemon.controller';
     { provide: POKEAPI_PORT, useClass: PokeApiClient },
     GetOrFetchPokemonUseCase,
   ],
-  exports: [POKEMON_REPOSITORY, GetOrFetchPokemonUseCase],
+  exports: [POKEMON_REPOSITORY, POKEAPI_PORT, GetOrFetchPokemonUseCase],
 })
 export class PokemonModule {}

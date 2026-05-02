@@ -1,0 +1,20 @@
+meta {
+  name: List Pokemon (cached)
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/pokemon
+  body: none
+  auth: none
+}
+
+headers {
+  X-API-Key: {{apiKey}}
+}
+
+params:query {
+  limit: 10
+  offset: 0
+}

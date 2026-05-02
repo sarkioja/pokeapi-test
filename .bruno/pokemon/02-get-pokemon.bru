@@ -1,0 +1,15 @@
+meta {
+  name: Get or Fetch Pokemon
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/v1/pokemon/{{pokemonName}}
+  body: none
+  auth: none
+}
+
+headers {
+  X-API-Key: {{apiKey}}
+}
