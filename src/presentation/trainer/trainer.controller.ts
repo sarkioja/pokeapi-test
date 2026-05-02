@@ -10,7 +10,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { CreateTrainerUseCase } from '../../application/trainer/use-cases/create-trainer.use-case';
 import { GetTrainerUseCase } from '../../application/trainer/use-cases/get-trainer.use-case';
 import { UpdateTrainerUseCase } from '../../application/trainer/use-cases/update-trainer.use-case';
@@ -21,6 +21,30 @@ import { CreateTrainerDto } from './dto/create-trainer.dto';
 import { UpdateTrainerDto } from './dto/update-trainer.dto';
 import { EnrichCepDto } from './dto/enrich-cep.dto';
 import { PaginationDto } from '../common/dto/pagination.dto';
+
+const TRAINER_EXAMPLE = {
+  id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+  name: 'Ash Ketchum',
+  email: 'ash@pokemon.com',
+  favoritePokeapiId: 25,
+  cep: null,
+  addressStreet: null,
+  addressNeighborhood: null,
+  addressCity: null,
+  addressState: null,
+  addressCountry: null,
+  createdAt: '2026-05-02T21:00:00.000Z',
+  updatedAt: '2026-05-02T21:00:00.000Z',
+};
+
+const TRAINER_WITH_ADDRESS_EXAMPLE = {
+  ...TRAINER_EXAMPLE,
+  cep: '01310-100',
+  addressStreet: 'Avenida Paulista',
+  addressNeighborhood: 'Bela Vista',
+  addressCity: 'São Paulo',
+  addressState: 'SP',
+};
 
 @ApiTags('trainers')
 @ApiSecurity('X-API-Key')
@@ -40,9 +64,22 @@ export class TrainerController {
     summary: 'Create a trainer',
     description: 'Creates a new trainer. The email must be unique among active (non-deleted) trainers. `favoritePokeapiId` is an optional reference to a PokéAPI Pokémon ID (e.g. 25 for Pikachu).',
   })
-  @ApiResponse({ status: 201, description: 'Trainer created successfully' })
-  @ApiResponse({ status: 400, description: 'Validation error (missing/invalid fields)' })
-  @ApiResponse({ status: 409, description: 'Email already in use by an active trainer' })
+  @ApiBody({
+    type: CreateTrainerDto,
+    examples: {
+      minimal: {
+        summary: 'Minimal (name + email)',
+        value: { name: 'Ash Ketchum', email: 'ash@pokemon.com' },
+      },
+      withFavorite: {
+        summary: 'With favorite Pokémon',
+        value: { name: 'Misty', email: 'misty@cerulean.com', favoritePokeapiId: 120 },
+      },
+    },
+  })
+  @ApiResponse({ status: 201, description: 'Trainer created successfully', schema: { example: TRAINER_EXAMPLE } })
+  @ApiResponse({ status: 400, description: 'Validation error (missing/invalid fields)', schema: { example: { statusCode: 400, error: 'BAD_REQUEST', message: 'email must be an email' } } })
+  @ApiResponse({ status: 409, description: 'Email already in use by an active trainer', schema: { example: { statusCode: 409, error: 'CONFLICT', message: 'Email ash@pokemon.com is already in use' } } })
   create(@Body() dto: CreateTrainerDto) {
     return this.createTrainer.execute(dto);
   }
@@ -52,7 +89,11 @@ export class TrainerController {
     summary: 'List trainers (paginated)',
     description: 'Returns a paginated list of all active (non-deleted) trainers. Use `limit` and `offset` for pagination.',
   })
-  @ApiResponse({ status: 200, description: 'Paginated list of trainers — `{ data: [...], total: number }`' })
+  @ApiResponse({
+    status: 200,
+    description: 'Paginated list of trainers',
+    schema: { example: { data: [TRAINER_EXAMPLE], total: 1 } },
+  })
   findAll(@Query() pagination: PaginationDto) {
     return this.getTrainer.findAll(pagination.limit, pagination.offset);
   }
@@ -63,8 +104,8 @@ export class TrainerController {
     description: 'Returns a single trainer by UUID. Soft-deleted trainers are not visible and return 404.',
   })
   @ApiParam({ name: 'id', description: 'Trainer UUID', example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' })
-  @ApiResponse({ status: 200, description: 'Trainer found' })
-  @ApiResponse({ status: 404, description: 'Trainer not found or soft-deleted' })
+  @ApiResponse({ status: 200, description: 'Trainer found', schema: { example: TRAINER_EXAMPLE } })
+  @ApiResponse({ status: 404, description: 'Trainer not found or soft-deleted', schema: { example: { statusCode: 404, error: 'NOT_FOUND', message: 'Trainer a1b2c3d4-e5f6-7890-abcd-ef1234567890 not found' } } })
   findOne(@Param('id') id: string) {
     return this.getTrainer.findById(id);
   }
@@ -74,8 +115,21 @@ export class TrainerController {
     summary: 'Update trainer',
     description: 'Partially updates trainer name, email, or favorite Pokémon ID. All fields are optional. Email change is rejected if already taken by another active trainer.',
   })
-  @ApiParam({ name: 'id', description: 'Trainer UUID' })
-  @ApiResponse({ status: 200, description: 'Trainer updated' })
+  @ApiParam({ name: 'id', description: 'Trainer UUID', example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' })
+  @ApiBody({
+    type: UpdateTrainerDto,
+    examples: {
+      nameOnly: {
+        summary: 'Update name only',
+        value: { name: 'Ash Ketchum (Champion)' },
+      },
+      emailAndFavorite: {
+        summary: 'Update email and favorite Pokémon',
+        value: { email: 'ash.champion@pokemon.com', favoritePokeapiId: 6 },
+      },
+    },
+  })
+  @ApiResponse({ status: 200, description: 'Trainer updated', schema: { example: { ...TRAINER_EXAMPLE, name: 'Ash Ketchum (Champion)' } } })
   @ApiResponse({ status: 400, description: 'Validation error' })
   @ApiResponse({ status: 404, description: 'Trainer not found' })
   @ApiResponse({ status: 409, description: 'Email already in use' })
@@ -88,10 +142,23 @@ export class TrainerController {
     summary: 'Enrich trainer address via ViaCEP',
     description: 'Looks up the Brazilian postal code (CEP) via the ViaCEP API and persists the full address (street, neighborhood, city, state) on the trainer. Accepts 8-digit CEP with or without hyphen (e.g. `01310-100` or `01310100`).',
   })
-  @ApiParam({ name: 'id', description: 'Trainer UUID' })
-  @ApiResponse({ status: 200, description: 'Address enriched and persisted on the trainer' })
-  @ApiResponse({ status: 400, description: 'Invalid CEP format (must be 8 digits)' })
-  @ApiResponse({ status: 404, description: 'Trainer not found, or CEP not found in ViaCEP' })
+  @ApiParam({ name: 'id', description: 'Trainer UUID', example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' })
+  @ApiBody({
+    type: EnrichCepDto,
+    examples: {
+      paulista: {
+        summary: 'Av. Paulista — São Paulo/SP',
+        value: { cep: '01310100' },
+      },
+      withHyphen: {
+        summary: 'Formatted with hyphen',
+        value: { cep: '01310-100' },
+      },
+    },
+  })
+  @ApiResponse({ status: 200, description: 'Address enriched and persisted', schema: { example: TRAINER_WITH_ADDRESS_EXAMPLE } })
+  @ApiResponse({ status: 400, description: 'Invalid CEP format (must be 8 digits)', schema: { example: { statusCode: 400, error: 'BAD_REQUEST', message: 'CEP must be 8 digits, optionally formatted as XXXXX-XXX' } } })
+  @ApiResponse({ status: 404, description: 'Trainer not found, or CEP not found in ViaCEP', schema: { example: { statusCode: 404, error: 'NOT_FOUND', message: 'CEP 00000000 not found' } } })
   @ApiResponse({ status: 502, description: 'ViaCEP API unavailable' })
   enrichCepAddress(@Param('id') id: string, @Body() dto: EnrichCepDto) {
     return this.enrichCep.execute(id, dto.cep);
@@ -103,8 +170,8 @@ export class TrainerController {
     summary: 'Soft-delete trainer',
     description: 'Soft-deletes the trainer and cascades the soft-delete to all their teams in a single transaction. The record is preserved for audit and can be restored via `PATCH /trainers/:id/restore`.',
   })
-  @ApiParam({ name: 'id', description: 'Trainer UUID' })
-  @ApiResponse({ status: 204, description: 'Trainer and their teams soft-deleted' })
+  @ApiParam({ name: 'id', description: 'Trainer UUID', example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' })
+  @ApiResponse({ status: 204, description: 'Trainer and their teams soft-deleted (no body)' })
   @ApiResponse({ status: 404, description: 'Trainer not found' })
   remove(@Param('id') id: string) {
     return this.deleteTrainer.execute(id);
@@ -115,10 +182,10 @@ export class TrainerController {
     summary: 'Restore soft-deleted trainer',
     description: 'Reactivates a previously soft-deleted trainer. Fails with 409 if another active trainer was created with the same email after the deletion (partial unique index on email WHERE deleted_at IS NULL).',
   })
-  @ApiParam({ name: 'id', description: 'Trainer UUID' })
-  @ApiResponse({ status: 200, description: 'Trainer restored' })
-  @ApiResponse({ status: 404, description: 'Trainer not found (was never created or already restored)' })
-  @ApiResponse({ status: 409, description: 'Email conflict — another active trainer uses this email' })
+  @ApiParam({ name: 'id', description: 'Trainer UUID', example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' })
+  @ApiResponse({ status: 200, description: 'Trainer restored', schema: { example: TRAINER_EXAMPLE } })
+  @ApiResponse({ status: 404, description: 'Trainer not found' })
+  @ApiResponse({ status: 409, description: 'Email conflict — another active trainer uses this email', schema: { example: { statusCode: 409, error: 'CONFLICT', message: 'Email ash@pokemon.com is already in use' } } })
   restore(@Param('id') id: string) {
     return this.restoreTrainer.execute(id);
   }
