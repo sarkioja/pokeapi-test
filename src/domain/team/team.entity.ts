@@ -24,4 +24,8 @@ export class Team {
   hasPokemon(pokemonId: string): boolean {
     return this.pokemon.some((tp) => tp.pokemonId === pokemonId);
   }
+
+  hasSlot(slotId: string): boolean {
+    return this.pokemon.some((tp) => tp.id === slotId);
+  }
 }

@@ -77,10 +77,11 @@ export class TeamTypeOrmRepository implements TeamRepositoryPort {
     );
   }
 
-  async removePokemon(teamId: string, pokemonId: string): Promise<void> {
-    await this.repo.manager.query(
-      `DELETE FROM team_pokemon WHERE team_id = $1 AND pokemon_id = $2`,
-      [teamId, pokemonId],
+  async removePokemon(teamId: string, slotId: string): Promise<void> {
+    const result = await this.repo.manager.query(
+      `DELETE FROM team_pokemon WHERE id = $1 AND team_id = $2`,
+      [slotId, teamId],
     );
+    if (result[1] === 0) throw new ResourceNotFoundException('TeamPokemon', slotId);
   }
 }

@@ -53,6 +53,7 @@ export class GetOrFetchPokemonUseCase {
         );
         return existing;
       }
+      if (err instanceof ResourceNotFoundException) throw err;
       if (err instanceof ExternalServiceException) throw err;
       throw new ExternalServiceException('PokéAPI', (err as Error).message);
     }

@@ -1,9 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import axios, { AxiosInstance } from 'axios';
+import axios, { AxiosError, AxiosInstance } from 'axios';
 import { PokeApiPort, PokeApiPokemonData } from '../../../domain/ports/pokeapi.port';
 import { DamageRelations } from '../../../domain/pokemon/pokemon-type.entity';
-import { ExternalServiceException } from '../../../domain/exceptions/external-service.exception';
+import {
+  ExternalServiceException,
+  ResourceNotFoundException,
+} from '../../../domain/exceptions/external-service.exception';
 import {
   PokeApiPokemonResponseDto,
   PokeApiTypeResponseDto,
@@ -58,6 +61,8 @@ export class PokeApiClient implements PokeApiPort {
       const response = await this.http.get<PokeApiPokemonResponseDto>(path);
       data = response.data;
     } catch (err) {
+      const status = (err as AxiosError).response?.status;
+      if (status === 404) throw new ResourceNotFoundException('Pokémon', path.split('/').pop()!);
       this.logger.error(`PokéAPI request failed: ${path}`, err);
       throw new ExternalServiceException('PokéAPI', (err as Error).message);
     }

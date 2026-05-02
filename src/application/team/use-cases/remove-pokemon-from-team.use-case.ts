@@ -12,8 +12,8 @@ export class RemovePokemonFromTeamUseCase {
     const team = await this.teamRepository.findByIdWithPokemon(teamId);
     if (!team) throw new ResourceNotFoundException('Team', teamId);
 
-    if (!team.hasPokemon(pokemonId)) {
-      throw new ResourceNotFoundException('Pokemon in team', pokemonId);
+    if (!team.hasSlot(pokemonId)) {
+      throw new ResourceNotFoundException('Pokemon slot in team', pokemonId);
     }
 
     await this.teamRepository.removePokemon(teamId, pokemonId);
