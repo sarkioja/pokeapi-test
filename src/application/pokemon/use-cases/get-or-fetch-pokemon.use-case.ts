@@ -16,7 +16,7 @@ export class GetOrFetchPokemonUseCase {
     private readonly pokeApi: PokeApiPort,
     private readonly config: ConfigService,
   ) {
-    const ttlHours = this.config.get<number>('POKEMON_TTL_HOURS', 24);
+    const ttlHours = Number(this.config.get<number>('POKEMON_TTL_HOURS', 24));
     this.ttlMs = ttlHours * 60 * 60 * 1000;
   }
 

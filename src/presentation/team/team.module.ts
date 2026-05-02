@@ -19,6 +19,7 @@ import { DeleteTeamUseCase } from '../../application/team/use-cases/delete-team.
 import { AddPokemonToTeamUseCase } from '../../application/team/use-cases/add-pokemon-to-team.use-case';
 import { RemovePokemonFromTeamUseCase } from '../../application/team/use-cases/remove-pokemon-from-team.use-case';
 import { GetOrFetchPokemonUseCase } from '../../application/pokemon/use-cases/get-or-fetch-pokemon.use-case';
+import { AnalyzeTeamTypesUseCase } from '../../application/team/use-cases/analyze-team-types.use-case';
 
 @Module({
   imports: [TypeOrmModule.forFeature([TeamOrmEntity, TrainerOrmEntity, PokemonOrmEntity, PokemonTypeOrmEntity])],
@@ -34,6 +35,7 @@ import { GetOrFetchPokemonUseCase } from '../../application/pokemon/use-cases/ge
     DeleteTeamUseCase,
     AddPokemonToTeamUseCase,
     RemovePokemonFromTeamUseCase,
+    AnalyzeTeamTypesUseCase,
   ],
   exports: [
     TEAM_REPOSITORY,
@@ -45,6 +47,7 @@ import { GetOrFetchPokemonUseCase } from '../../application/pokemon/use-cases/ge
     DeleteTeamUseCase,
     AddPokemonToTeamUseCase,
     RemovePokemonFromTeamUseCase,
+    AnalyzeTeamTypesUseCase,
     GetOrFetchPokemonUseCase,
   ],
 })
