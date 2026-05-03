@@ -75,6 +75,22 @@ jobs:
       - name: E2E tests
         run: npm run test:e2e
 
+  build-validate:
+    name: Build Docker Image (validate)
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          target: production
+          push: false
+
   build-and-push:
     name: Build Docker Image → GHCR
     runs-on: ubuntu-latest
