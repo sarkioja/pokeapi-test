@@ -263,11 +263,38 @@ npm run migration:revert
 
 ---
 
+## Deploy
+
+### Ambientes
+
+| Ambiente | Branch | Hosting | Banco |
+|----------|--------|---------|-------|
+| Develop  | `develop` | Render (free) | Neon.tech branch `dev` |
+| Produção | `main`    | Render (free) | Neon.tech branch `main` |
+
+Deploy disparado automaticamente pelos GitHub Actions após todos os testes passarem.
+
+### Configuração inicial (Render + Neon)
+
+1. Criar projeto no [Neon.tech](https://neon.tech) com dois branches: `dev` e `main`
+2. Criar dois Web Services no [Render](https://render.com) usando o `render.yaml` na raiz do repositório:
+   - `pokeapi-test-dev` → branch `develop`
+   - `pokeapi-test-prod` → branch `main`
+3. Runtime = **Docker**, Health Check Path = `/api/health`
+4. Configurar `API_KEYS` manualmente no dashboard do Render (variável marcada como `sync: false`)
+
+### GitHub Secrets necessários
+
+| Secret | Descrição |
+|--------|-----------|
+| `RENDER_DEPLOY_HOOK_DEV` | Webhook URL do serviço develop no Render |
+| `RENDER_DEPLOY_HOOK_PROD` | Webhook URL do serviço produção no Render |
+
+---
+
 ## Acesso à API de teste
 
-> **Em breve** — URL e chaves do ambiente `develop` (Render + Neon) serão adicionadas após o deploy.
-
-Para explorar os endpoints localmente:
-- **Swagger UI**: `http://localhost:3000/api`
-- **Bruno collection**: pasta `.bruno/` (importe no app [Bruno](https://www.usebruno.com/))
-- **API Key padrão local**: `change-me-dev-key-1` (configurada no `.env.example`)
+- **Swagger UI (develop)**: `<URL_RENDER_DEV>/api`
+- **Chave de API**: configurada via `API_KEYS` no dashboard do Render
+- **Bruno collection**: pasta `.bruno/` — importe no [Bruno](https://www.usebruno.com/)
+- **Local**: `http://localhost:3000/api` com key `change-me-dev-key-1`
