@@ -4,11 +4,11 @@ import { IsEmail, IsInt, IsOptional, IsString, Min } from 'class-validator';
 export class CreateTrainerDto {
   @ApiProperty()
   @IsString()
-  name: string;
+  declare name: string;
 
   @ApiProperty()
   @IsEmail()
-  email: string;
+  declare email: string;
 
   @ApiPropertyOptional()
   @IsOptional()
