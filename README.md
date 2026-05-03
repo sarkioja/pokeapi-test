@@ -263,35 +263,6 @@ npm run migration:revert
 
 ---
 
-## Deploy
-
-### Ambientes
-
-| Ambiente | Branch | Hosting | Banco |
-|----------|--------|---------|-------|
-| Develop  | `develop` | Render (free) | Neon.tech branch `dev` |
-| Produção | `main`    | Render (free) | Neon.tech branch `main` |
-
-Deploy disparado automaticamente pelos GitHub Actions após todos os testes passarem.
-
-### Configuração inicial (Render + Neon)
-
-1. Criar projeto no [Neon.tech](https://neon.tech) com dois branches: `dev` e `main`
-2. Criar dois Web Services no [Render](https://render.com) usando o `render.yaml` na raiz do repositório:
-   - `pokeapi-test-dev` → branch `develop`
-   - `pokeapi-test-prod` → branch `main`
-3. Runtime = **Docker**, Health Check Path = `/api/health`
-4. Configurar `API_KEYS` manualmente no dashboard do Render (variável marcada como `sync: false`)
-
-### GitHub Secrets necessários
-
-| Secret | Descrição |
-|--------|-----------|
-| `RENDER_DEPLOY_HOOK_DEV` | Webhook URL do serviço develop no Render |
-| `RENDER_DEPLOY_HOOK_PROD` | Webhook URL do serviço produção no Render |
-
----
-
 ## Acesso à API de teste
 
 - **Swagger UI (develop)**: `<URL_RENDER_DEV>/api`
