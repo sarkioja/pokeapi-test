@@ -1,6 +1,6 @@
 # pokeapi-test
 
-REST API para gerenciar Treinadores, Times e Pokémon — desafio técnico para Sênior Backend Developer.
+REST API para gerenciar Treinadores, Times e Pokémon.
 
 Construído com **NestJS · TypeORM · PostgreSQL** seguindo Clean/Hexagonal Architecture.
 
