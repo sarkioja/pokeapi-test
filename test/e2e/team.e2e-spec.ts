@@ -77,7 +77,7 @@ describe('Teams (E2E)', () => {
   });
 
   describe('GET /trainers/:trainerId/teams', () => {
-    it('lists teams for a trainer', async () => {
+    it('lists teams for a trainer with pokemon roster', async () => {
       const trainer = await createTrainer(app);
       await createTeam(app, trainer.id, 'Team A');
       await createTeam(app, trainer.id, 'Team B');
@@ -88,6 +88,8 @@ describe('Teams (E2E)', () => {
         .expect(200);
 
       expect(res.body.total).toBe(2);
+      expect(res.body.data[0].pokemon).toBeDefined();
+      expect(Array.isArray(res.body.data[0].pokemon)).toBe(true);
     });
   });
 

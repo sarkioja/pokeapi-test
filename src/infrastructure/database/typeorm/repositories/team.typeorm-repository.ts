@@ -41,11 +41,12 @@ export class TeamTypeOrmRepository implements TeamRepositoryPort {
   async findByTrainerId(trainerId: string, limit: number, offset: number): Promise<TeamPage> {
     const [data, total] = await this.repo.findAndCount({
       where: { trainerId },
+      relations: ['teamPokemon', 'teamPokemon.pokemon'],
       order: { createdAt: 'ASC' },
       take: limit,
       skip: offset,
     });
-    return { data: data.map((e) => TeamMapper.toDomain({ ...e, teamPokemon: [] })), total };
+    return { data: data.map((e) => TeamMapper.toDomain(e)), total };
   }
 
   async update(id: string, data: UpdateTeamData): Promise<Team> {
