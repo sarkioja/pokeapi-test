@@ -38,7 +38,7 @@ services:
       POKEMON_TYPE_TTL_DAYS: ${POKEMON_TYPE_TTL_DAYS:-7}
       HTTP_TIMEOUT_MS: ${HTTP_TIMEOUT_MS:-5000}
       VIACEP_BASE_URL: ${VIACEP_BASE_URL:-https://viacep.com.br/ws}
-      API_KEYS: ${API_KEYS:-dev-key-local}
+      API_KEYS: ${API_KEYS:-change-me-local-dev-key-replace-me}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
       LOG_LEVEL: ${LOG_LEVEL:-debug}
     ports:

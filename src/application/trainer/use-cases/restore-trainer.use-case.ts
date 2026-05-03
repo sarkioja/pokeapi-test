@@ -20,6 +20,6 @@ export class RestoreTrainerUseCase {
     const emailTaken = await this.trainerRepository.existsActiveByEmail(trainer.email, id);
     if (emailTaken) throw new EmailConflictException(trainer.email);
 
-    return this.trainerRepository.restore(id);
+    return this.trainerRepository.restoreWithTeams(id);
   }
 }

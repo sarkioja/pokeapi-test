@@ -2,22 +2,22 @@
 
 ## Escolha Arquitetural: Clean / Hexagonal Architecture
 
-O projeto adota os princípios da **Clean Architecture** (Robert C. Martin) com influências da **Arquitetura Hexagonal** (Ports & Adapters — Alistair Cockburn). A regra central é a **Dependency Rule**: dependências só apontam para dentro — camadas externas dependem de camadas internas, nunca o contrário.
+O projeto adota os princípios da **Clean Architecture** (Robert C. Martin) com influências da **Arquitetura Hexagonal** (Ports & Adapters — Alistair Cockburn). A regra central é a **Dependency Rule**: dependências sempre apontam para dentro — camadas externas dependem de camadas internas, nunca o contrário.
 
 ```
 Presentation → Application → Domain ← Infrastructure
 ```
 
-A camada de **Domain** é o núcleo: contém entidades, ports (interfaces) e exceções, e **não importa nada de NestJS, TypeORM ou qualquer framework**. Isso permite testar a lógica de negócio com mocks simples, sem subir banco ou HTTP.
+A camada de **Domain** é o núcleo: contém entidades, ports (interfaces) e exceções, e **não importa nada de NestJS, TypeORM ou qualquer framework externo**. Isso permite testar a lógica de negócio com mocks simples, sem precisar subir banco ou servidor HTTP.
 
 ### Por que essa arquitetura?
 
 | Decisão | Alternativa considerada | Motivo da escolha |
 |---|---|---|
-| Clean / Hexagonal | MVC simples (controller → service → repository) | Separação clara entre regra de negócio e infraestrutura; use cases testáveis sem framework |
-| Ports como interfaces no Domain | Injetar repositório TypeORM diretamente no use case | Evita acoplamento ao ORM; fácil trocar PostgreSQL por outro banco sem tocar a lógica |
-| Use Cases como classes | Services NestJS com lógica misturada | Cada use case tem responsabilidade única; facilita leitura, teste e evolução independente |
-| Exceções de domínio puras | `HttpException` do NestJS no domínio | Domínio não sabe que existe HTTP; o `GlobalExceptionFilter` faz o mapeamento |
+| Clean / Hexagonal | MVC simples (controller → service → repository) | Separa claramente o que é regra de negócio do que é detalhe de infraestrutura. Use cases são testáveis com mocks, sem framework. |
+| Ports como interfaces no Domain | Injetar o repositório TypeORM diretamente no use case | O use case não sabe que existe TypeORM ou PostgreSQL. Trocar o banco de dados não exige tocar na lógica de negócio. |
+| Use Cases como classes com responsabilidade única | Services NestJS com múltiplas responsabilidades | Cada use case faz uma coisa só. Fica fácil de ler, testar e evoluir sem medo de quebrar outro fluxo. |
+| Exceções de domínio como classes TypeScript puras | Lançar `HttpException` do NestJS dentro do domínio | O domínio não sabe que existe HTTP. O `GlobalExceptionFilter` na camada de Presentation faz o mapeamento para status codes. |
 
 ---
 
@@ -100,12 +100,22 @@ flowchart TD
 
     subgraph APPLICATION["Application Layer (Use Cases)"]
         CT[CreateTrainerUseCase]
+        GetT[GetTrainerUseCase]
+        UT[UpdateTrainerUseCase]
         ECE[EnrichTrainerCepUseCase]
         DTR[DeleteTrainerUseCase]
+        RRT[RestoreTrainerUseCase]
+
         CTE[CreateTeamUseCase]
+        GetTE[GetTeamUseCase]
+        UTE[UpdateTeamUseCase]
+        DTE[DeleteTeamUseCase]
         APT[AddPokemonToTeamUseCase]
-        GOP[GetOrFetchPokemonUseCase]
+        RPT[RemovePokemonFromTeamUseCase]
         ATA[AnalyzeTeamTypesUseCase]
+
+        GOP[GetOrFetchPokemonUseCase]
+        LP[ListPokemonUseCase]
     end
 
     subgraph DOMAIN["Domain Layer (Entities + Ports)"]
@@ -131,15 +141,17 @@ flowchart TD
         PKEXT[PokéAPI]
     end
 
-    TC --> CT & ECE & DTR
-    TEC --> CTE & APT & ATA
-    PC --> GOP
+    TC --> CT & GetT & UT & ECE & DTR & RRT
+    TEC --> CTE & GetTE & UTE & DTE & APT & RPT & ATA
+    PC --> GOP & LP
     HC --> PG
 
-    CT & ECE & DTR --> TRP
+    CT & GetT & UT & DTR & RRT --> TRP
+    ECE --> TRP
     ECE --> VP
-    CTE & APT & ATA --> TMP
-    APT & GOP --> PP
+    CTE & GetTE & UTE & DTE & ATA --> TMP
+    APT & RPT --> TMP
+    APT & GOP & LP --> PP
     ATA --> PAP
 
     TRP -.-> TORM
@@ -173,10 +185,9 @@ flowchart TD
 ```
 
 - **TTL configurável** via `POKEMON_TTL_HOURS` (padrão: 24h)
-- **Fallback resiliente**: PokéAPI indisponível + dado local existente → retorna stale + warning, nunca 503
-- **Upsert por `pokeapi_id`**: idempotente, evita duplicatas entre variantes do mesmo pokémon
-- **Cache de tipos** (`POKEMON_TYPES`): efetividade de tipos para `/analysis` com TTL próprio de 7 dias (`POKEMON_TYPE_TTL_DAYS`)
-- **Redis não adotado**: PostgreSQL local já serve como cache. Redis seria justificado com múltiplos pods e alta concorrência — adição futura sem refatoração de arquitetura
+- **Fallback resiliente**: se a PokéAPI estiver fora do ar mas o dado existir localmente (mesmo que expirado), a API retorna o dado stale com um warning no log — nunca 503. Um 502 só acontece se não houver dado local algum.
+- **Upsert por `pokeapi_id`**: idempotente — chamar o mesmo pokémon duas vezes não cria duplicatas.
+- **Cache de tipos** (`POKEMON_TYPES`): efetividade de tipos para o endpoint `/analysis` tem TTL próprio de 7 dias (`POKEMON_TYPE_TTL_DAYS`) — tipos mudam muito raramente.
 
 ---
 
@@ -184,62 +195,53 @@ flowchart TD
 
 | Biblioteca | Versão | Decisão |
 |---|---|---|
-| `@nestjs/core` | 10 | Framework principal — DI, módulos, guards, interceptors, pipes |
-| `typeorm` | 0.3 | ORM escolhido conforme requisito. `synchronize: false` em todos os ambientes — somente migrations |
-| `axios` | — | HTTP client para PokéAPI e ViaCEP. Configurado com timeout (`HTTP_TIMEOUT_MS`) e tratamento de erro por status |
-| `class-validator` + `class-transformer` | — | Validação e transformação de DTOs na camada de Presentation. Domínio usa validação própria (`CepVO`) sem dependência de framework |
-| `@nestjs/swagger` | — | Documentação OpenAPI 3.0 gerada automaticamente a partir dos decorators nos controllers e DTOs |
-| `@nestjs/terminus` | — | Health check com verificação de conectividade do banco (`GET /api/health`) |
-| `@nestjs/throttler` | — | Rate limiting: 100 req/min por IP |
-| `helmet` | — | Headers de segurança HTTP. CSP ajustado para não forçar upgrade de HTTP→HTTPS em localhost (compatibilidade Safari) |
-| `joi` | — | Validação do schema de variáveis de ambiente na inicialização. App não sobe se `API_KEYS` estiver vazio |
-| `jest` + `ts-jest` | — | Três configs separadas: unit (`jest.config.ts`), integration (`jest.integration.config.ts`), E2E (`jest.e2e.config.ts`) |
-| `supertest` | — | Requisições HTTP nos testes E2E contra o `AppModule` completo |
-| `pg` | — | Driver PostgreSQL direto (usado no `globalSetup` de testes para criar/dropar o schema `test`) |
+| `@nestjs/core` | 10 | Framework principal — provê DI, módulos, guards, interceptors e pipes com convenções claras. |
+| `typeorm` | 0.3 | ORM escolhido conforme requisito. `synchronize: false` em todos os ambientes — o schema evolui exclusivamente via migrations versionadas. |
+| `axios` | — | HTTP client para PokéAPI e ViaCEP. Configurado com timeout (`HTTP_TIMEOUT_MS`) e tratamento de erro por status code, com propagação para as exceções do domínio. |
+| `class-validator` + `class-transformer` | — | Validação e transformação de DTOs na camada de Presentation. O Domain usa sua própria validação (`CepVO`) sem depender de nenhuma biblioteca. |
+| `@nestjs/swagger` | — | Documentação OpenAPI 3.0 gerada automaticamente a partir dos decorators nos controllers e DTOs. |
+| `@nestjs/terminus` | — | Health check com verificação real de conectividade do banco (`GET /api/health`). |
+| `@nestjs/throttler` | — | Rate limiting: 100 requisições por minuto por IP. |
+| `helmet` | — | Headers de segurança HTTP (X-Frame-Options, X-Content-Type-Options, etc.). CSP ajustado para não forçar upgrade HTTP→HTTPS em localhost, evitando problemas no Safari. |
+| `joi` | — | Validação do schema de variáveis de ambiente na inicialização. A aplicação não sobe se `API_KEYS` estiver vazio ou mal formado. |
+| `jest` + `ts-jest` | — | Três configs separadas: unit (`jest.config.ts`), integration (`jest.integration.config.ts`), E2E (`jest.e2e.config.ts`). |
+| `supertest` | — | Requisições HTTP nos testes E2E contra o `AppModule` completo. |
+| `pg` | — | Driver PostgreSQL direto, usado no `globalSetup` de testes para criar e dropar o schema `test`. |
 
 ### Decisões de estrutura notáveis
 
 **`CepVO` — Value Object puro**
-Validação do formato de CEP (regex 8 dígitos) implementada como classe TypeScript sem `class-validator`. O domínio não sabe que existe uma biblioteca de validação de HTTP — o VO é testável de forma isolada e pode ser reutilizado fora do contexto NestJS.
+A validação do formato de CEP (regex de 8 dígitos) é implementada como uma classe TypeScript simples, sem `class-validator`. O Domain não sabe que existe uma biblioteca de validação HTTP — o VO é testável de forma completamente isolada e pode ser reutilizado fora do contexto NestJS. Se a validação fosse feita só no DTO (Presentation), a regra ficaria amarrada ao framework.
 
 **Mappers na camada de Infrastructure**
-A conversão entre `OrmEntity` (TypeORM) e `DomainEntity` (POJO) acontece nos mappers em `infrastructure/database/typeorm/mappers/`. O domínio nunca vê decorators do TypeORM (`@Column`, `@Entity`) e a infraestrutura nunca expõe objetos de domínio com lógica de negócio diretamente ao banco.
+A conversão entre `OrmEntity` (objeto do TypeORM, cheio de decorators `@Column` e `@Entity`) e `DomainEntity` (POJO simples com lógica de negócio) acontece nos mappers em `infrastructure/database/typeorm/mappers/`. O Domain nunca vê anotações do TypeORM, e a Infrastructure nunca expõe objetos de domínio diretamente ao banco. Isso permite, por exemplo, mudar o tipo de uma coluna no banco sem tocar no Domain.
 
 **`APP_GUARD` global para API Key**
-O `ApiKeyGuard` é registrado como guard global no `AppModule`. Rotas públicas (`/api/health`, Swagger) recebem o decorator `@Public()`. Isso garante que qualquer novo endpoint seja protegido por padrão — é necessário opt-out explícito, não opt-in.
+O `ApiKeyGuard` é registrado como guard global no `AppModule`. Rotas públicas (`/api/health` e o Swagger em `/api`) recebem o decorator `@Public()` para opt-out explícito. A consequência prática: qualquer novo endpoint criado fica protegido por padrão, sem precisar lembrar de adicionar um guard — o esquecimento é seguro.
 
 **Migrations como único mecanismo de schema**
-`synchronize: false` em todos os ambientes, inclusive local. O schema evolui apenas via migrations TypeORM versionadas. Isso evita divergências entre desenvolvimento e produção e torna o histórico de schema auditável via Git.
+`synchronize: false` em todos os ambientes, inclusive local. O schema evolui apenas via migrations TypeORM versionadas e commitadas no Git. Isso elimina a classe de bugs onde o banco de desenvolvimento diverge silenciosamente do de produção, e torna o histórico de schema rastreável junto com o código.
 
 ---
 
 ## Hierarquia de Erros de Domínio
 
-Exceções de domínio são classes TypeScript puras, sem dependências de framework. O `GlobalExceptionFilter` mapeia para HTTP:
+Exceções são classes TypeScript puras, sem dependências de framework. O `GlobalExceptionFilter` na camada de Presentation intercepta qualquer exceção não tratada e a converte para a resposta HTTP apropriada.
 
 ```
-DomainException
+DomainException (abstract, extends Error)
 ├── TeamFullException           → 422 Unprocessable Entity
 ├── DuplicatePokemonException   → 409 Conflict
 ├── TeamArchivedException       → 422 Unprocessable Entity
-└── InvalidCepException         → 400 Bad Request
+├── InvalidCepException         → 400 Bad Request
+└── EmailConflictException      → 409 Conflict
 
-ResourceNotFoundException       → 404 Not Found
-CepNotFoundExternalException    → 404 Not Found
-ExternalServiceException        → 502 Bad Gateway
+ResourceNotFoundException       → 404 Not Found   (extends Error diretamente)
+ExternalServiceException        → 502 Bad Gateway  (extends Error diretamente)
+CepNotFoundExternalException    → 404 Not Found    (extends Error diretamente)
 ```
 
----
-
-## Estrutura de pastas
-
-```
-src/
-├── domain/          # Entidades, ports, exceções — sem dependências de framework
-├── application/     # Use cases — orquestram domínio e ports
-├── infrastructure/  # TypeORM, HTTP clients (PokéAPI, ViaCEP), config
-└── presentation/    # Controllers, DTOs, guards, filters
-```
+`DomainException` agrupa erros causados por violação de regra de negócio — o cliente fez algo inválido. As três exceções soltas (`ResourceNotFoundException`, `ExternalServiceException`, `CepNotFoundExternalException`) representam situações que não são exatamente "regra violada", mas sim recursos ausentes ou serviços externos com problema, por isso não herdam de `DomainException`.
 
 ---
 
@@ -247,9 +249,9 @@ src/
 
 | Serviço | Endpoint | Uso |
 |---------|----------|-----|
-| **PokéAPI** | `/pokemon/:name` | Busca e cache de pokémon |
+| **PokéAPI** | `/pokemon/:name` | Busca e cache de dados de pokémon |
 | **PokéAPI** | `/type/:name` | Cache de efetividade de tipos para `/analysis` |
-| **ViaCEP** | `/:cep/json/` | Enriquecimento de endereço por CEP |
+| **ViaCEP** | `/:cep/json/` | Enriquecimento de endereço por CEP (apenas endereços brasileiros) |
 
 ---
 
@@ -258,4 +260,5 @@ src/
 - `synchronize: false` em todos os ambientes — somente migrations
 - Soft delete (`deleted_at`) em Trainers e Teams via `@DeleteDateColumn`
 - Índice único parcial em `trainers(email) WHERE deleted_at IS NULL` — permite restore sem conflito de e-mail
-- `UNIQUE(team_id, pokemon_id)` em `team_pokemon` — impede duplicatas no time
+- `UNIQUE(team_id, pokemon_id)` e `UNIQUE(team_id, slot)` em `team_pokemon`
+- Ver modelo completo e decisões de modelagem em [erd.md](erd.md)

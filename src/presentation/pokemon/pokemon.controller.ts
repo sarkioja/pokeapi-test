@@ -1,10 +1,7 @@
-import { Controller, Get, Inject, Param, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { GetOrFetchPokemonUseCase } from '../../application/pokemon/use-cases/get-or-fetch-pokemon.use-case';
-import {
-  POKEMON_REPOSITORY,
-  PokemonRepositoryPort,
-} from '../../domain/pokemon/pokemon.repository.port';
+import { ListPokemonUseCase } from '../../application/pokemon/use-cases/list-pokemon.use-case';
 import { PaginationDto } from '../common/dto/pagination.dto';
 
 const POKEMON_EXAMPLE = {
@@ -41,8 +38,7 @@ const CHARIZARD_EXAMPLE = {
 export class PokemonController {
   constructor(
     private readonly getOrFetch: GetOrFetchPokemonUseCase,
-    @Inject(POKEMON_REPOSITORY)
-    private readonly pokemonRepository: PokemonRepositoryPort,
+    private readonly listPokemon: ListPokemonUseCase,
   ) {}
 
   @Get()
@@ -57,7 +53,7 @@ export class PokemonController {
     schema: { example: { data: [POKEMON_EXAMPLE, CHARIZARD_EXAMPLE], total: 2 } },
   })
   findAll(@Query() pagination: PaginationDto) {
-    return this.pokemonRepository.findAll(pagination.limit, pagination.offset);
+    return this.listPokemon.execute(pagination.limit, pagination.offset);
   }
 
   @Get(':nameOrId')

@@ -31,6 +31,7 @@ const makeRepo = (): jest.Mocked<TrainerRepositoryPort> => ({
   updateAddress: jest.fn(),
   softDelete: jest.fn(),
   restore: jest.fn(),
+  restoreWithTeams: jest.fn(),
   existsActiveByEmail: jest.fn(),
 });
 

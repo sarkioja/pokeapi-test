@@ -40,3 +40,4 @@ Criados via migration (não gerenciáveis pelo `synchronize`):
 |--------|--------|-----------|
 | `trainers_email_active` | `trainers(email) WHERE deleted_at IS NULL` | Garante unicidade de e-mail apenas entre registros ativos |
 | `UNIQUE(team_id, pokemon_id)` | `team_pokemon` | Impede duplicatas de pokémon no mesmo time |
+| `UNIQUE(team_id, slot)` | `team_pokemon` | Garante que dois pokémon não ocupam o mesmo slot dentro do mesmo time |

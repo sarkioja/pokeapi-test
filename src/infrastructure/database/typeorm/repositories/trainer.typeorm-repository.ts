@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { TrainerOrmEntity } from '../entities/trainer.orm-entity';
+import { TeamOrmEntity } from '../entities/team.orm-entity';
 import { TrainerMapper } from '../mappers/trainer.mapper';
 import {
   TrainerRepositoryPort,
@@ -85,6 +86,29 @@ export class TrainerTypeOrmRepository implements TrainerRepositoryPort {
 
   async restore(id: string): Promise<Trainer> {
     await this.repo.restore(id);
+    const restored = await this.repo.findOne({ where: { id } });
+    if (!restored) throw new ResourceNotFoundException('Trainer', id);
+    return TrainerMapper.toDomain(restored);
+  }
+
+  async restoreWithTeams(id: string): Promise<Trainer> {
+    await this.repo.manager.transaction(async (manager) => {
+      const trainerOrm = await manager.findOne(TrainerOrmEntity, {
+        where: { id },
+        withDeleted: true,
+      });
+
+      await manager
+        .getRepository(TeamOrmEntity)
+        .createQueryBuilder()
+        .restore()
+        .where('trainer_id = :id', { id })
+        .andWhere('deleted_at = :deletedAt', { deletedAt: trainerOrm!.deletedAt })
+        .execute();
+
+      await manager.restore(TrainerOrmEntity, id);
+    });
+
     const restored = await this.repo.findOne({ where: { id } });
     if (!restored) throw new ResourceNotFoundException('Trainer', id);
     return TrainerMapper.toDomain(restored);

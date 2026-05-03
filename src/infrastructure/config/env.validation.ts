@@ -31,5 +31,19 @@ export const envValidationSchema = Joi.object({
       custom: 'Either DATABASE_URL or DB_HOST/DB_USERNAME/DB_PASSWORD/DB_NAME must be provided',
     });
   }
+
+  if (value.NODE_ENV === 'production') {
+    const keys = (value.API_KEYS as string)
+      .split(',')
+      .map((k: string) => k.trim())
+      .filter(Boolean);
+    const short = keys.filter((k: string) => k.length < 32);
+    if (short.length > 0) {
+      return helpers.message({
+        custom: `API_KEYS: all keys must be at least 32 characters long in production (${short.length} key(s) too short)`,
+      });
+    }
+  }
+
   return value;
 });

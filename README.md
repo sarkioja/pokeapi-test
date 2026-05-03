@@ -1,8 +1,12 @@
 # pokeapi-test
 
-REST API para gerenciar Treinadores, Times e Pokémon.
+API REST construída como prova de conceito de Clean/Hexagonal Architecture em NestJS com TypeScript. O domínio de Pokémon é um pretexto: o objetivo real é demonstrar como organizar uma aplicação backend onde regras de negócio, infraestrutura e integrações externas ficam isoladas entre si e podem evoluir de forma independente.
 
-Construído com **NestJS · TypeORM · PostgreSQL** seguindo Clean/Hexagonal Architecture.
+A API gerencia treinadores, seus times e os pokémon que os compõem. Duas integrações externas entram nessa equação com propósitos distintos.
+
+A [PokéAPI](https://pokeapi.co) é uma API pública com dados de toda a franquia Pokémon. Aqui ela serve de fonte para buscar e armazenar dados de pokémon sob demanda, com cache local no PostgreSQL e TTL configurável. Quando a PokéAPI está indisponível, o sistema entrega os dados em cache com uma advertência em vez de falhar a requisição.
+
+O [ViaCEP](https://viacep.com.br) é um serviço gratuito de consulta de CEPs brasileiros. Ao cadastrar um CEP, o perfil do treinador é enriquecido com o endereço completo buscado na hora. É uma integração mais simples, mas mostra como tratar uma dependência externa com validação no domínio e tratamento de erros próprio.
 
 ---
 
@@ -11,7 +15,7 @@ Construído com **NestJS · TypeORM · PostgreSQL** seguindo Clean/Hexagonal Arc
 | Camada | Tecnologia |
 |--------|-----------|
 | Framework | NestJS 10 + TypeScript |
-| ORM / DB | TypeORM 0.3 + PostgreSQL 15 |
+| ORM / DB | TypeORM 0.3 + PostgreSQL 16 |
 | Validação | class-validator + class-transformer |
 | Docs | @nestjs/swagger (OpenAPI 3.0) |
 | Testes | Jest — unit / integration / E2E |
@@ -37,7 +41,7 @@ npm install
 
 ```bash
 cp .env.example .env
-# Edite API_KEYS com pelo menos uma chave (ex: minha-chave-dev)
+# API_KEYS aceita qualquer valor em desenvolvimento; veja docs/security.md para requisitos de produção
 ```
 
 ### 3. Subir o banco de dados
@@ -77,7 +81,7 @@ Swagger UI: `http://localhost:3000/api`
 | `DB_PASSWORD` | `postgres` | Senha |
 | `DB_NAME` | `pokeapi_dev` | Nome do banco |
 | `DATABASE_URL` | — | Connection string Neon (substitui as vars acima em produção) |
-| `API_KEYS` | **obrigatório** | Chaves de acesso separadas por vírgula |
+| `API_KEYS` | **obrigatório** | Chaves de acesso separadas por vírgula — mínimo 32 chars por chave em produção (ver [docs/security.md](docs/security.md)) |
 | `POKEAPI_BASE_URL` | `https://pokeapi.co/api/v2` | Base URL da PokéAPI |
 | `POKEMON_TTL_HOURS` | `24` | TTL do cache de pokémon (horas) |
 | `POKEMON_TYPE_TTL_DAYS` | `7` | TTL do cache de tipos (dias) |
@@ -85,7 +89,7 @@ Swagger UI: `http://localhost:3000/api`
 | `VIACEP_BASE_URL` | `https://viacep.com.br/ws` | Base URL do ViaCEP |
 | `CORS_ORIGINS` | `http://localhost:3000` | Origens CORS permitidas |
 
-> A aplicação **não sobe** se `API_KEYS` estiver vazio.
+> A aplicação **não sobe** se `API_KEYS` estiver vazio. Em `production`, chaves com menos de 32 caracteres também são rejeitadas.
 
 ---
 
