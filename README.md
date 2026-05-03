@@ -15,7 +15,7 @@ O [ViaCEP](https://viacep.com.br) é um serviço gratuito de consulta de CEPs br
 | Camada | Tecnologia |
 |--------|-----------|
 | Framework | NestJS 10 + TypeScript |
-| ORM / DB | TypeORM 0.3 + PostgreSQL 15 |
+| ORM / DB | TypeORM 0.3 + PostgreSQL 16 |
 | Validação | class-validator + class-transformer |
 | Docs | @nestjs/swagger (OpenAPI 3.0) |
 | Testes | Jest — unit / integration / E2E |
