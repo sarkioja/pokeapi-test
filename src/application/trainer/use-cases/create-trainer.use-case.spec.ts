@@ -4,7 +4,20 @@ import { EmailConflictException } from '../../../domain/exceptions/email-conflic
 import { Trainer } from '../../../domain/trainer/trainer.entity';
 
 const makeTrainer = (): Trainer =>
-  new Trainer('id-1', 'Ash Ketchum', 'ash@pokemon.com', null, null, null, null, null, null, null, new Date(), new Date());
+  new Trainer(
+    'id-1',
+    'Ash Ketchum',
+    'ash@pokemon.com',
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    new Date(),
+    new Date(),
+  );
 
 const makeRepo = (): jest.Mocked<TrainerRepositoryPort> => ({
   create: jest.fn(),
@@ -42,8 +55,9 @@ describe('CreateTrainerUseCase', () => {
   it('throws EmailConflictException when email is already in use', async () => {
     repo.existsActiveByEmail.mockResolvedValue(true);
 
-    await expect(useCase.execute({ name: 'Ash', email: 'ash@pokemon.com' }))
-      .rejects.toBeInstanceOf(EmailConflictException);
+    await expect(useCase.execute({ name: 'Ash', email: 'ash@pokemon.com' })).rejects.toBeInstanceOf(
+      EmailConflictException,
+    );
     expect(repo.create).not.toHaveBeenCalled();
   });
 });

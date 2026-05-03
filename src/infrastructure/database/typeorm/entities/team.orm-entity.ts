@@ -37,7 +37,10 @@ export class TeamOrmEntity {
   @DeleteDateColumn({ name: 'deleted_at' })
   deletedAt: Date | null;
 
-  @ManyToOne(() => TrainerOrmEntity, (trainer) => trainer.teams, { onDelete: 'SET NULL', nullable: true })
+  @ManyToOne(() => TrainerOrmEntity, (trainer) => trainer.teams, {
+    onDelete: 'SET NULL',
+    nullable: true,
+  })
   @JoinColumn({ name: 'trainer_id' })
   trainer: TrainerOrmEntity;
 

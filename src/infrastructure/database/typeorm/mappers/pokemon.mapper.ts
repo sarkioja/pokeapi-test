@@ -21,11 +21,6 @@ export class PokemonMapper {
   }
 
   static typeToDomain(orm: PokemonTypeOrmEntity): PokemonType {
-    return new PokemonType(
-      orm.id,
-      orm.typeName,
-      orm.damageRelations,
-      orm.fetchedAt,
-    );
+    return new PokemonType(orm.id, orm.typeName, orm.damageRelations, orm.fetchedAt);
   }
 }

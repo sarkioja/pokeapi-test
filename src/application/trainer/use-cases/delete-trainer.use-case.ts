@@ -1,6 +1,9 @@
 import { Inject } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { TRAINER_REPOSITORY, TrainerRepositoryPort } from '../../../domain/trainer/trainer.repository.port';
+import {
+  TRAINER_REPOSITORY,
+  TrainerRepositoryPort,
+} from '../../../domain/trainer/trainer.repository.port';
 import { ResourceNotFoundException } from '../../../domain/exceptions/external-service.exception';
 
 export class DeleteTrainerUseCase {
@@ -20,10 +23,7 @@ export class DeleteTrainerUseCase {
         `UPDATE teams SET deleted_at = $1 WHERE trainer_id = $2 AND deleted_at IS NULL`,
         [now, id],
       );
-      await manager.query(
-        `UPDATE trainers SET deleted_at = $1 WHERE id = $2`,
-        [now, id],
-      );
+      await manager.query(`UPDATE trainers SET deleted_at = $1 WHERE id = $2`, [now, id]);
     });
   }
 }

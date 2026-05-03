@@ -15,11 +15,7 @@ import { RemovePokemonFromTeamUseCase } from '../../application/team/use-cases/r
 import { AnalyzeTeamTypesUseCase } from '../../application/team/use-cases/analyze-team-types.use-case';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([TeamOrmEntity]),
-    TrainerModule,
-    PokemonModule,
-  ],
+  imports: [TypeOrmModule.forFeature([TeamOrmEntity]), TrainerModule, PokemonModule],
   controllers: [TeamController],
   providers: [
     { provide: TEAM_REPOSITORY, useClass: TeamTypeOrmRepository },

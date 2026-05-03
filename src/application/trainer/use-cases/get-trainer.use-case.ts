@@ -1,6 +1,10 @@
 import { Inject } from '@nestjs/common';
 import { Trainer } from '../../../domain/trainer/trainer.entity';
-import { TRAINER_REPOSITORY, TrainerRepositoryPort, TrainerPage } from '../../../domain/trainer/trainer.repository.port';
+import {
+  TRAINER_REPOSITORY,
+  TrainerRepositoryPort,
+  TrainerPage,
+} from '../../../domain/trainer/trainer.repository.port';
 import { ResourceNotFoundException } from '../../../domain/exceptions/external-service.exception';
 
 export class GetTrainerUseCase {

@@ -24,7 +24,9 @@ export class ApiKeyGuard implements CanActivate, OnModuleInit {
   onModuleInit() {
     const rawKeys = this.configService.get<string>('API_KEYS', '');
     if (!rawKeys || rawKeys.trim() === '') {
-      throw new Error('API_KEYS must not be empty — application cannot start without valid API keys');
+      throw new Error(
+        'API_KEYS must not be empty — application cannot start without valid API keys',
+      );
     }
     this.validKeys = new Set(
       rawKeys

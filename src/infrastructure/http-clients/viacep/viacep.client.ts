@@ -3,7 +3,10 @@ import { ConfigService } from '@nestjs/config';
 import axios, { AxiosInstance } from 'axios';
 import { ViaCepPort } from '../../../domain/ports/viacep.port';
 import { AddressData } from '../../../domain/shared/address-data';
-import { CepNotFoundExternalException, ExternalServiceException } from '../../../domain/exceptions/external-service.exception';
+import {
+  CepNotFoundExternalException,
+  ExternalServiceException,
+} from '../../../domain/exceptions/external-service.exception';
 import { ViaCepResponseDto } from './dto/viacep-response.dto';
 
 @Injectable()

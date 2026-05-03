@@ -5,7 +5,20 @@ import { ResourceNotFoundException } from '../../../domain/exceptions/external-s
 import { EmailConflictException } from '../../../domain/exceptions/email-conflict.exception';
 
 const makeTrainer = (): Trainer =>
-  new Trainer('id-1', 'Ash', 'ash@pokemon.com', null, null, null, null, null, null, null, new Date(), new Date());
+  new Trainer(
+    'id-1',
+    'Ash',
+    'ash@pokemon.com',
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    new Date(),
+    new Date(),
+  );
 
 const makeRepo = (): jest.Mocked<TrainerRepositoryPort> => ({
   create: jest.fn(),

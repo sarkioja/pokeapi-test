@@ -1,9 +1,15 @@
 import { Inject, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Pokemon } from '../../../domain/pokemon/pokemon.entity';
-import { POKEMON_REPOSITORY, PokemonRepositoryPort } from '../../../domain/pokemon/pokemon.repository.port';
+import {
+  POKEMON_REPOSITORY,
+  PokemonRepositoryPort,
+} from '../../../domain/pokemon/pokemon.repository.port';
 import { POKEAPI_PORT, PokeApiPort } from '../../../domain/ports/pokeapi.port';
-import { ResourceNotFoundException, ExternalServiceException } from '../../../domain/exceptions/external-service.exception';
+import {
+  ResourceNotFoundException,
+  ExternalServiceException,
+} from '../../../domain/exceptions/external-service.exception';
 
 export class GetOrFetchPokemonUseCase {
   private readonly logger = new Logger(GetOrFetchPokemonUseCase.name);

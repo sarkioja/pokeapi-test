@@ -24,13 +24,17 @@ async function createApp(): Promise<INestApplication> {
 
 async function createTrainer(app: INestApplication, email = 'ash@test.com') {
   const res = await request(app.getHttpServer())
-    .post(TRAINERS).set('X-API-Key', API_KEY).send({ name: 'Ash', email });
+    .post(TRAINERS)
+    .set('X-API-Key', API_KEY)
+    .send({ name: 'Ash', email });
   return res.body as { id: string };
 }
 
 async function createTeam(app: INestApplication, trainerId: string, name = 'Dream Team') {
   const res = await request(app.getHttpServer())
-    .post(TEAMS).set('X-API-Key', API_KEY).send({ name, trainerId });
+    .post(TEAMS)
+    .set('X-API-Key', API_KEY)
+    .send({ name, trainerId });
   return res.body as { id: string; name: string; status: string; pokemon: unknown[] };
 }
 
@@ -59,7 +63,8 @@ describe('Teams (E2E)', () => {
       const trainer = await createTrainer(app);
 
       const res = await request(app.getHttpServer())
-        .post(TEAMS).set('X-API-Key', API_KEY)
+        .post(TEAMS)
+        .set('X-API-Key', API_KEY)
         .send({ name: 'Dream Team', trainerId: trainer.id })
         .expect(201);
 
@@ -70,7 +75,8 @@ describe('Teams (E2E)', () => {
 
     it('returns 404 when trainer does not exist', () => {
       return request(app.getHttpServer())
-        .post(TEAMS).set('X-API-Key', API_KEY)
+        .post(TEAMS)
+        .set('X-API-Key', API_KEY)
         .send({ name: 'Team', trainerId: '00000000-0000-0000-0000-000000000000' })
         .expect(404);
     });
@@ -178,7 +184,9 @@ describe('Teams (E2E)', () => {
       const trainer = await createTrainer(app);
       const team = await createTeam(app, trainer.id);
       await request(app.getHttpServer())
-        .patch(`${TEAMS}/${team.id}`).set('X-API-Key', API_KEY).send({ status: 'archived' });
+        .patch(`${TEAMS}/${team.id}`)
+        .set('X-API-Key', API_KEY)
+        .send({ status: 'archived' });
 
       return request(app.getHttpServer())
         .post(`${TEAMS}/${team.id}/pokemon`)
@@ -225,7 +233,8 @@ describe('Teams (E2E)', () => {
         .expect(204);
 
       const res = await request(app.getHttpServer())
-        .get(`${TEAMS}/${team.id}`).set('X-API-Key', API_KEY);
+        .get(`${TEAMS}/${team.id}`)
+        .set('X-API-Key', API_KEY);
       expect(res.body.pokemon).toHaveLength(0);
     }, 15000);
   });

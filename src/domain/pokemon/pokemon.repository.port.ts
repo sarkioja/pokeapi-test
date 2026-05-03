@@ -25,6 +25,10 @@ export interface PokemonRepositoryPort {
   findByPokeapiId(pokeapiId: number): Promise<Pokemon | null>;
   findByName(name: string): Promise<Pokemon | null>;
   findAll(limit: number, offset: number): Promise<PokemonPage>;
-  upsertType(typeName: string, damageRelations: PokemonType['damageRelations'], fetchedAt: Date): Promise<PokemonType>;
+  upsertType(
+    typeName: string,
+    damageRelations: PokemonType['damageRelations'],
+    fetchedAt: Date,
+  ): Promise<PokemonType>;
   findTypeByName(typeName: string): Promise<PokemonType | null>;
 }

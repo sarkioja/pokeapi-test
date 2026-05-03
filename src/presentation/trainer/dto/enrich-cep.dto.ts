@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, Length, Matches } from 'class-validator';
+import { IsString, Matches } from 'class-validator';
 
 export class EnrichCepDto {
   @ApiProperty({ example: '01310100' })

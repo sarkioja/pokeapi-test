@@ -38,7 +38,16 @@ export class PokemonTypeOrmRepository implements PokemonRepositoryPort {
         updatedAt: new Date(),
       })
       .orUpdate(
-        ['name', 'sprite_url', 'types', 'base_experience', 'height', 'weight', 'fetched_at', 'updated_at'],
+        [
+          'name',
+          'sprite_url',
+          'types',
+          'base_experience',
+          'height',
+          'weight',
+          'fetched_at',
+          'updated_at',
+        ],
         ['pokeapi_id'],
       )
       .execute();
@@ -71,7 +80,11 @@ export class PokemonTypeOrmRepository implements PokemonRepositoryPort {
     return { data: data.map(PokemonMapper.toDomain), total };
   }
 
-  async upsertType(typeName: string, damageRelations: DamageRelations, fetchedAt: Date): Promise<PokemonType> {
+  async upsertType(
+    typeName: string,
+    damageRelations: DamageRelations,
+    fetchedAt: Date,
+  ): Promise<PokemonType> {
     await this.typeRepo
       .createQueryBuilder()
       .insert()

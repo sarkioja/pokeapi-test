@@ -1,6 +1,9 @@
 import { Inject } from '@nestjs/common';
 import { Trainer } from '../../../domain/trainer/trainer.entity';
-import { TRAINER_REPOSITORY, TrainerRepositoryPort } from '../../../domain/trainer/trainer.repository.port';
+import {
+  TRAINER_REPOSITORY,
+  TrainerRepositoryPort,
+} from '../../../domain/trainer/trainer.repository.port';
 import { VIACEP_PORT, ViaCepPort } from '../../../domain/ports/viacep.port';
 import { CepVO } from '../../../domain/trainer/value-objects/cep.vo';
 import { ResourceNotFoundException } from '../../../domain/exceptions/external-service.exception';

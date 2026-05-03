@@ -13,16 +13,17 @@ export interface DbEnv {
   logging?: boolean;
 }
 
-export function buildBaseDataSourceOptions(
-  env: DbEnv,
-  basePath: string,
-): DataSourceOptions {
+export function buildBaseDataSourceOptions(env: DbEnv, basePath: string): DataSourceOptions {
   const isDev = env.nodeEnv === 'development';
 
   const logging: ('query' | 'error')[] =
     env.logging === undefined
-      ? isDev ? ['query', 'error'] : ['error']
-      : env.logging ? ['query', 'error'] : ['error'];
+      ? isDev
+        ? ['query', 'error']
+        : ['error']
+      : env.logging
+        ? ['query', 'error']
+        : ['error'];
 
   const shared = {
     synchronize: false as const,

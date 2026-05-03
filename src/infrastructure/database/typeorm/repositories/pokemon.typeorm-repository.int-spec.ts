@@ -9,7 +9,13 @@ import { TeamOrmEntity } from '../entities/team.orm-entity';
 import { TrainerOrmEntity } from '../entities/trainer.orm-entity';
 import { DamageRelations } from '../../../../domain/pokemon/pokemon-type.entity';
 
-const ALL_ENTITIES = [PokemonOrmEntity, PokemonTypeOrmEntity, TeamPokemonOrmEntity, TeamOrmEntity, TrainerOrmEntity];
+const ALL_ENTITIES = [
+  PokemonOrmEntity,
+  PokemonTypeOrmEntity,
+  TeamPokemonOrmEntity,
+  TeamOrmEntity,
+  TrainerOrmEntity,
+];
 
 const DB = {
   type: 'postgres' as const,
@@ -49,10 +55,7 @@ describe('PokemonTypeOrmRepository (integration)', () => {
 
   beforeAll(async () => {
     module = await Test.createTestingModule({
-      imports: [
-        TypeOrmModule.forRoot(DB),
-        TypeOrmModule.forFeature(ALL_ENTITIES),
-      ],
+      imports: [TypeOrmModule.forRoot(DB), TypeOrmModule.forFeature(ALL_ENTITIES)],
       providers: [PokemonTypeOrmRepository],
     }).compile();
 

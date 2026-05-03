@@ -6,7 +6,20 @@ import { ResourceNotFoundException } from '../../../domain/exceptions/external-s
 import { InvalidCepException } from '../../../domain/exceptions/invalid-cep.exception';
 
 const makeTrainer = (): Trainer =>
-  new Trainer('id-1', 'Ash', 'ash@pokemon.com', null, null, null, null, null, null, null, new Date(), new Date());
+  new Trainer(
+    'id-1',
+    'Ash',
+    'ash@pokemon.com',
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    new Date(),
+    new Date(),
+  );
 
 const makeRepo = (): jest.Mocked<TrainerRepositoryPort> => ({
   create: jest.fn(),
@@ -43,8 +56,9 @@ describe('EnrichTrainerCepUseCase', () => {
   it('throws ResourceNotFoundException when trainer does not exist', async () => {
     repo.findById.mockResolvedValue(null);
 
-    await expect(useCase.execute('unknown-id', '01310100'))
-      .rejects.toBeInstanceOf(ResourceNotFoundException);
+    await expect(useCase.execute('unknown-id', '01310100')).rejects.toBeInstanceOf(
+      ResourceNotFoundException,
+    );
     expect(viaCep.lookup).not.toHaveBeenCalled();
   });
 

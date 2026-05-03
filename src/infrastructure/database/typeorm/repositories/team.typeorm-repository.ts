@@ -20,7 +20,11 @@ export class TeamTypeOrmRepository implements TeamRepositoryPort {
   ) {}
 
   async create(data: CreateTeamData): Promise<Team> {
-    const entity = this.repo.create({ name: data.name, trainerId: data.trainerId, status: 'active' });
+    const entity = this.repo.create({
+      name: data.name,
+      trainerId: data.trainerId,
+      status: 'active',
+    });
     const saved = await this.repo.save(entity);
     return TeamMapper.toDomain({ ...saved, teamPokemon: [] });
   }
@@ -64,13 +68,19 @@ export class TeamTypeOrmRepository implements TeamRepositoryPort {
   }
 
   async softDeleteByTrainerId(trainerId: string): Promise<void> {
-    await this.repo.createQueryBuilder()
+    await this.repo
+      .createQueryBuilder()
       .softDelete()
       .where('trainer_id = :trainerId', { trainerId })
       .execute();
   }
 
-  async addPokemon(teamId: string, pokemonId: string, slot: number, nickname?: string): Promise<void> {
+  async addPokemon(
+    teamId: string,
+    pokemonId: string,
+    slot: number,
+    nickname?: string,
+  ): Promise<void> {
     await this.repo.manager.query(
       `INSERT INTO team_pokemon (id, team_id, pokemon_id, slot, nickname, added_at)
        VALUES (uuid_generate_v4(), $1, $2, $3, $4, now())`,

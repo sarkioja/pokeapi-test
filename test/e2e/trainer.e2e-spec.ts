@@ -85,8 +85,14 @@ describe('Trainers (E2E)', () => {
 
   describe('GET /trainers', () => {
     it('returns paginated list', async () => {
-      await request(app.getHttpServer()).post(BASE).set('X-API-Key', API_KEY).send({ name: 'Ash', email: 'ash@test.com' });
-      await request(app.getHttpServer()).post(BASE).set('X-API-Key', API_KEY).send({ name: 'Misty', email: 'misty@test.com' });
+      await request(app.getHttpServer())
+        .post(BASE)
+        .set('X-API-Key', API_KEY)
+        .send({ name: 'Ash', email: 'ash@test.com' });
+      await request(app.getHttpServer())
+        .post(BASE)
+        .set('X-API-Key', API_KEY)
+        .send({ name: 'Misty', email: 'misty@test.com' });
 
       const res = await request(app.getHttpServer())
         .get(`${BASE}?limit=1&offset=0`)
@@ -101,7 +107,9 @@ describe('Trainers (E2E)', () => {
   describe('GET /trainers/:id', () => {
     it('returns trainer by id', async () => {
       const { body: created } = await request(app.getHttpServer())
-        .post(BASE).set('X-API-Key', API_KEY).send({ name: 'Ash', email: 'ash@test.com' });
+        .post(BASE)
+        .set('X-API-Key', API_KEY)
+        .send({ name: 'Ash', email: 'ash@test.com' });
 
       const res = await request(app.getHttpServer())
         .get(`${BASE}/${created.id}`)
@@ -122,7 +130,9 @@ describe('Trainers (E2E)', () => {
   describe('PATCH /trainers/:id', () => {
     it('updates trainer name', async () => {
       const { body: created } = await request(app.getHttpServer())
-        .post(BASE).set('X-API-Key', API_KEY).send({ name: 'Ash', email: 'ash@test.com' });
+        .post(BASE)
+        .set('X-API-Key', API_KEY)
+        .send({ name: 'Ash', email: 'ash@test.com' });
 
       const res = await request(app.getHttpServer())
         .patch(`${BASE}/${created.id}`)
@@ -137,7 +147,9 @@ describe('Trainers (E2E)', () => {
   describe('PATCH /trainers/:id/cep', () => {
     it('returns 400 for invalid CEP format', async () => {
       const { body: created } = await request(app.getHttpServer())
-        .post(BASE).set('X-API-Key', API_KEY).send({ name: 'Ash', email: 'ash@test.com' });
+        .post(BASE)
+        .set('X-API-Key', API_KEY)
+        .send({ name: 'Ash', email: 'ash@test.com' });
 
       return request(app.getHttpServer())
         .patch(`${BASE}/${created.id}/cep`)
@@ -150,7 +162,9 @@ describe('Trainers (E2E)', () => {
   describe('DELETE /trainers/:id', () => {
     it('soft-deletes trainer and returns 204', async () => {
       const { body: created } = await request(app.getHttpServer())
-        .post(BASE).set('X-API-Key', API_KEY).send({ name: 'Ash', email: 'ash@test.com' });
+        .post(BASE)
+        .set('X-API-Key', API_KEY)
+        .send({ name: 'Ash', email: 'ash@test.com' });
 
       await request(app.getHttpServer())
         .delete(`${BASE}/${created.id}`)
@@ -167,7 +181,9 @@ describe('Trainers (E2E)', () => {
   describe('PATCH /trainers/:id/restore', () => {
     it('restores soft-deleted trainer', async () => {
       const { body: created } = await request(app.getHttpServer())
-        .post(BASE).set('X-API-Key', API_KEY).send({ name: 'Ash', email: 'ash@test.com' });
+        .post(BASE)
+        .set('X-API-Key', API_KEY)
+        .send({ name: 'Ash', email: 'ash@test.com' });
 
       await request(app.getHttpServer()).delete(`${BASE}/${created.id}`).set('X-API-Key', API_KEY);
 
@@ -181,13 +197,17 @@ describe('Trainers (E2E)', () => {
 
     it('returns 409 when email is taken after restore', async () => {
       const { body: first } = await request(app.getHttpServer())
-        .post(BASE).set('X-API-Key', API_KEY).send({ name: 'Ash', email: 'ash@test.com' });
+        .post(BASE)
+        .set('X-API-Key', API_KEY)
+        .send({ name: 'Ash', email: 'ash@test.com' });
 
       await request(app.getHttpServer()).delete(`${BASE}/${first.id}`).set('X-API-Key', API_KEY);
 
       // Another trainer takes the email while first is deleted
       await request(app.getHttpServer())
-        .post(BASE).set('X-API-Key', API_KEY).send({ name: 'Impostor', email: 'ash@test.com' });
+        .post(BASE)
+        .set('X-API-Key', API_KEY)
+        .send({ name: 'Impostor', email: 'ash@test.com' });
 
       return request(app.getHttpServer())
         .patch(`${BASE}/${first.id}/restore`)

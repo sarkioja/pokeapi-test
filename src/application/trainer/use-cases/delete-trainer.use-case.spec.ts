@@ -4,7 +4,20 @@ import { Trainer } from '../../../domain/trainer/trainer.entity';
 import { ResourceNotFoundException } from '../../../domain/exceptions/external-service.exception';
 
 const makeTrainer = (): Trainer =>
-  new Trainer('id-1', 'Ash', 'ash@pokemon.com', null, null, null, null, null, null, null, new Date(), new Date());
+  new Trainer(
+    'id-1',
+    'Ash',
+    'ash@pokemon.com',
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    new Date(),
+    new Date(),
+  );
 
 const makeRepo = (): jest.Mocked<TrainerRepositoryPort> => ({
   create: jest.fn(),
@@ -29,7 +42,9 @@ describe('DeleteTrainerUseCase', () => {
     repo = makeRepo();
     mockManager = { query: jest.fn() };
     mockDataSource = {
-      transaction: jest.fn(async (cb: (manager: typeof mockManager) => Promise<void>) => cb(mockManager)),
+      transaction: jest.fn(async (cb: (manager: typeof mockManager) => Promise<void>) =>
+        cb(mockManager),
+      ),
     };
     useCase = new DeleteTrainerUseCase(repo, mockDataSource as any);
   });

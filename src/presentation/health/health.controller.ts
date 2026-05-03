@@ -16,7 +16,8 @@ export class HealthController {
   @HealthCheck()
   @ApiOperation({
     summary: 'Health check',
-    description: 'Checks database connectivity via a TCP ping. **No API key required.** Returns `{ status: "ok" }` when healthy, or `{ status: "error" }` with details when the database is unreachable.',
+    description:
+      'Checks database connectivity via a TCP ping. **No API key required.** Returns `{ status: "ok" }` when healthy, or `{ status: "error" }` with details when the database is unreachable.',
   })
   @ApiResponse({
     status: 200,

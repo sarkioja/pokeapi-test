@@ -1,6 +1,10 @@
 import { Inject } from '@nestjs/common';
 import { Team } from '../../../domain/team/team.entity';
-import { TEAM_REPOSITORY, TeamRepositoryPort, UpdateTeamData } from '../../../domain/team/team.repository.port';
+import {
+  TEAM_REPOSITORY,
+  TeamRepositoryPort,
+  UpdateTeamData,
+} from '../../../domain/team/team.repository.port';
 import { ResourceNotFoundException } from '../../../domain/exceptions/external-service.exception';
 
 export class UpdateTeamUseCase {

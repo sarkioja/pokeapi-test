@@ -5,7 +5,19 @@ import { Pokemon } from '../../../domain/pokemon/pokemon.entity';
 import { ExternalServiceException } from '../../../domain/exceptions/external-service.exception';
 
 const makePokemon = (fetchedAt: Date = new Date()): Pokemon =>
-  new Pokemon('p-1', 25, 'pikachu', null, ['electric'], 112, 4, 60, fetchedAt, new Date(), new Date());
+  new Pokemon(
+    'p-1',
+    25,
+    'pikachu',
+    null,
+    ['electric'],
+    112,
+    4,
+    60,
+    fetchedAt,
+    new Date(),
+    new Date(),
+  );
 
 const POKEAPI_DATA = {
   pokeapiId: 25,
@@ -98,7 +110,9 @@ describe('GetOrFetchPokemonUseCase', () => {
       repo.findByName.mockResolvedValue(null);
       pokeApi.fetchPokemonByName.mockRejectedValue(new Error('network error'));
 
-      await expect(useCase.executeByName('pikachu')).rejects.toBeInstanceOf(ExternalServiceException);
+      await expect(useCase.executeByName('pikachu')).rejects.toBeInstanceOf(
+        ExternalServiceException,
+      );
     });
   });
 

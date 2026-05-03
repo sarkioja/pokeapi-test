@@ -52,9 +52,7 @@ describe('Pokemon (E2E)', () => {
     });
 
     it('returns cached pokemon after a fetch', async () => {
-      await request(app.getHttpServer())
-        .get(`${BASE}/pikachu`)
-        .set('X-API-Key', API_KEY);
+      await request(app.getHttpServer()).get(`${BASE}/pikachu`).set('X-API-Key', API_KEY);
 
       const res = await request(app.getHttpServer())
         .get(BASE)
@@ -88,8 +86,7 @@ describe('Pokemon (E2E)', () => {
     }, 15000);
 
     it('returns 200 from cache on second request (no PokéAPI call)', async () => {
-      await request(app.getHttpServer())
-        .get(`${BASE}/pikachu`).set('X-API-Key', API_KEY);
+      await request(app.getHttpServer()).get(`${BASE}/pikachu`).set('X-API-Key', API_KEY);
 
       const pokeApi = app.get<PokeApiPort>(POKEAPI_PORT);
       const spy = jest.spyOn(pokeApi, 'fetchPokemonByName');
@@ -111,9 +108,7 @@ describe('Pokemon (E2E)', () => {
     }, 15000);
 
     it('returns 401 without API key', () => {
-      return request(app.getHttpServer())
-        .get(`${BASE}/pikachu`)
-        .expect(401);
+      return request(app.getHttpServer()).get(`${BASE}/pikachu`).expect(401);
     });
   });
 });

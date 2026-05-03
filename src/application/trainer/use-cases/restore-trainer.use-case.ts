@@ -1,6 +1,9 @@
 import { Inject } from '@nestjs/common';
 import { Trainer } from '../../../domain/trainer/trainer.entity';
-import { TRAINER_REPOSITORY, TrainerRepositoryPort } from '../../../domain/trainer/trainer.repository.port';
+import {
+  TRAINER_REPOSITORY,
+  TrainerRepositoryPort,
+} from '../../../domain/trainer/trainer.repository.port';
 import { ResourceNotFoundException } from '../../../domain/exceptions/external-service.exception';
 import { EmailConflictException } from '../../../domain/exceptions/email-conflict.exception';
 

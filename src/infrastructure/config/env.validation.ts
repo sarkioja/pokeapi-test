@@ -23,7 +23,10 @@ export const envValidationSchema = Joi.object({
   CORS_ORIGINS: Joi.string().default('http://localhost:3000'),
   LOG_LEVEL: Joi.string().valid('debug', 'info', 'warn', 'error').default('info'),
 }).custom((value, helpers) => {
-  if (!value.DATABASE_URL && (!value.DB_HOST || !value.DB_USERNAME || !value.DB_PASSWORD || !value.DB_NAME)) {
+  if (
+    !value.DATABASE_URL &&
+    (!value.DB_HOST || !value.DB_USERNAME || !value.DB_PASSWORD || !value.DB_NAME)
+  ) {
     return helpers.message({
       custom: 'Either DATABASE_URL or DB_HOST/DB_USERNAME/DB_PASSWORD/DB_NAME must be provided',
     });

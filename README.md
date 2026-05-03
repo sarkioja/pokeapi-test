@@ -202,6 +202,16 @@ src/
 
 ---
 
+## Convenções Git
+
+Veja [docs/git-conventions.md](docs/git-conventions.md) para:
+
+- Padrão de mensagens de commit (Conventional Commits)
+- Estratégia de branches (Trunk-Based Development adaptado)
+- Hooks locais via Husky (pre-commit: lint + typecheck, pre-push: unit tests)
+
+---
+
 ## Testes
 
 ```bash

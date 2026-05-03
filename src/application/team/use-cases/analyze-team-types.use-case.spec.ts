@@ -21,15 +21,20 @@ const makeTeam = (slots: TeamPokemon[]): Team =>
   new Team('team-1', 'Dream Team', 'active', 'trainer-1', slots, new Date(), new Date());
 
 const makeType = (dr: Partial<DamageRelations>): PokemonType =>
-  new PokemonType('type-1', 'electric', {
-    doubleDamageTo: [],
-    halfDamageTo: [],
-    noDamageTo: [],
-    doubleDamageFrom: [],
-    halfDamageFrom: [],
-    noDamageFrom: [],
-    ...dr,
-  }, new Date());
+  new PokemonType(
+    'type-1',
+    'electric',
+    {
+      doubleDamageTo: [],
+      halfDamageTo: [],
+      noDamageTo: [],
+      doubleDamageFrom: [],
+      halfDamageFrom: [],
+      noDamageFrom: [],
+      ...dr,
+    },
+    new Date(),
+  );
 
 const ELECTRIC_RELATIONS: DamageRelations = {
   doubleDamageTo: ['water', 'flying'],
@@ -78,7 +83,9 @@ describe('AnalyzeTeamTypesUseCase', () => {
     teamRepo = makeTeamRepo();
     pokemonRepo = makePokemonRepo();
     pokeApi = makePokeApi();
-    useCase = new AnalyzeTeamTypesUseCase(teamRepo, pokemonRepo, pokeApi, { get: jest.fn().mockReturnValue(7) } as any);
+    useCase = new AnalyzeTeamTypesUseCase(teamRepo, pokemonRepo, pokeApi, {
+      get: jest.fn().mockReturnValue(7),
+    } as any);
   });
 
   it('throws ResourceNotFoundException when team does not exist', async () => {

@@ -10,13 +10,35 @@ import { TeamFullException } from '../../../domain/exceptions/team-full.exceptio
 import { DuplicatePokemonException } from '../../../domain/exceptions/duplicate-pokemon.exception';
 
 const makePokemon = (id = 'p-1'): Pokemon =>
-  new Pokemon(id, 25, 'pikachu', null, ['electric'], 112, 4, 60, new Date(), new Date(), new Date());
+  new Pokemon(
+    id,
+    25,
+    'pikachu',
+    null,
+    ['electric'],
+    112,
+    4,
+    60,
+    new Date(),
+    new Date(),
+    new Date(),
+  );
 
 const makeSlot = (pokemonId: string, slot: number): TeamPokemon =>
   new TeamPokemon(`slot-${slot}`, 'team-1', pokemonId, slot, null, new Date());
 
-const makeTeam = (overrides: Partial<{ status: 'active' | 'archived'; pokemon: TeamPokemon[] }> = {}): Team =>
-  new Team('team-1', 'Dream Team', overrides.status ?? 'active', 'trainer-1', overrides.pokemon ?? [], new Date(), new Date());
+const makeTeam = (
+  overrides: Partial<{ status: 'active' | 'archived'; pokemon: TeamPokemon[] }> = {},
+): Team =>
+  new Team(
+    'team-1',
+    'Dream Team',
+    overrides.status ?? 'active',
+    'trainer-1',
+    overrides.pokemon ?? [],
+    new Date(),
+    new Date(),
+  );
 
 const makeRepo = (): jest.Mocked<TeamRepositoryPort> => ({
   create: jest.fn(),
@@ -44,14 +66,18 @@ describe('AddPokemonToTeamUseCase', () => {
   it('throws ResourceNotFoundException when team does not exist', async () => {
     teamRepo.findByIdWithPokemon.mockResolvedValue(null);
 
-    await expect(useCase.execute('team-1', 'pikachu')).rejects.toBeInstanceOf(ResourceNotFoundException);
+    await expect(useCase.execute('team-1', 'pikachu')).rejects.toBeInstanceOf(
+      ResourceNotFoundException,
+    );
     expect(getOrFetch.executeByName).not.toHaveBeenCalled();
   });
 
   it('throws TeamArchivedException when team is archived', async () => {
     teamRepo.findByIdWithPokemon.mockResolvedValue(makeTeam({ status: 'archived' }));
 
-    await expect(useCase.execute('team-1', 'pikachu')).rejects.toBeInstanceOf(TeamArchivedException);
+    await expect(useCase.execute('team-1', 'pikachu')).rejects.toBeInstanceOf(
+      TeamArchivedException,
+    );
     expect(getOrFetch.executeByName).not.toHaveBeenCalled();
   });
 
@@ -68,7 +94,9 @@ describe('AddPokemonToTeamUseCase', () => {
     teamRepo.findByIdWithPokemon.mockResolvedValue(makeTeam({ pokemon: [existing] }));
     getOrFetch.executeByName.mockResolvedValue(makePokemon('p-1'));
 
-    await expect(useCase.execute('team-1', 'pikachu')).rejects.toBeInstanceOf(DuplicatePokemonException);
+    await expect(useCase.execute('team-1', 'pikachu')).rejects.toBeInstanceOf(
+      DuplicatePokemonException,
+    );
     expect(teamRepo.addPokemon).not.toHaveBeenCalled();
   });
 
