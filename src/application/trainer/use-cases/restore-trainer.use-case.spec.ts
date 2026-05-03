@@ -30,6 +30,7 @@ const makeRepo = (): jest.Mocked<TrainerRepositoryPort> => ({
   updateAddress: jest.fn(),
   softDelete: jest.fn(),
   restore: jest.fn(),
+  restoreWithTeams: jest.fn(),
   existsActiveByEmail: jest.fn(),
 });
 
@@ -47,7 +48,7 @@ describe('RestoreTrainerUseCase', () => {
 
     await expect(useCase.execute('unknown-id')).rejects.toBeInstanceOf(ResourceNotFoundException);
     expect(repo.existsActiveByEmail).not.toHaveBeenCalled();
-    expect(repo.restore).not.toHaveBeenCalled();
+    expect(repo.restoreWithTeams).not.toHaveBeenCalled();
   });
 
   it('throws EmailConflictException when email is taken by another active trainer', async () => {
@@ -55,19 +56,19 @@ describe('RestoreTrainerUseCase', () => {
     repo.existsActiveByEmail.mockResolvedValue(true);
 
     await expect(useCase.execute('id-1')).rejects.toBeInstanceOf(EmailConflictException);
-    expect(repo.restore).not.toHaveBeenCalled();
+    expect(repo.restoreWithTeams).not.toHaveBeenCalled();
   });
 
-  it('restores trainer when email is not conflicting', async () => {
+  it('restores trainer and associated teams', async () => {
     const trainer = makeTrainer();
     repo.findWithDeletedById.mockResolvedValue(trainer);
     repo.existsActiveByEmail.mockResolvedValue(false);
-    repo.restore.mockResolvedValue(trainer);
+    repo.restoreWithTeams.mockResolvedValue(trainer);
 
     const result = await useCase.execute('id-1');
 
     expect(repo.existsActiveByEmail).toHaveBeenCalledWith('ash@pokemon.com', 'id-1');
-    expect(repo.restore).toHaveBeenCalledWith('id-1');
+    expect(repo.restoreWithTeams).toHaveBeenCalledWith('id-1');
     expect(result.id).toBe('id-1');
   });
 });
