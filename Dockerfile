@@ -23,4 +23,4 @@ COPY package*.json ./
 EXPOSE 3000
 USER node
 
-CMD ["node", "dist/main"]
+CMD ["sh", "-c", "node node_modules/.bin/typeorm -d dist/infrastructure/database/data-source.js migration:run && node dist/main"]

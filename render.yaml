@@ -11,7 +11,7 @@ services:
     region: oregon
     plan: free
     healthCheckPath: /api/health
-    preDeployCommand: node node_modules/.bin/typeorm -d dist/infrastructure/database/data-source.js migration:run
+
     envVars:
       - key: NODE_ENV
         value: production
@@ -50,7 +50,7 @@ services:
     region: oregon
     plan: free
     healthCheckPath: /api/health
-    preDeployCommand: node node_modules/.bin/typeorm -d dist/infrastructure/database/data-source.js migration:run
+
     envVars:
       - key: NODE_ENV
         value: production
