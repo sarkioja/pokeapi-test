@@ -156,7 +156,7 @@ API Key, rate limiting, helmet, CORS e Swagger UI:
 
 ## Acesso à API de teste
 
-- **Swagger UI (develop)**: `<URL_RENDER_DEV>/api`
-- **Chave de API**: configurada via `API_KEYS` no dashboard do Render
-- **Bruno collection**: pasta `.bruno/` — importe no [Bruno](https://www.usebruno.com/)
-- **Local**: `http://localhost:3000/api` com key `change-me-dev-key-1`
+- **Swagger UI**: https://pokeapi-test-dev.onrender.com/api
+- **Chave de API**: utilize a `API_KEY` fornecida
+- **Bruno collection**: pasta `.bruno/` — importe no [Bruno](https://www.usebruno.com/); a chave de acesso local está no `.env` gerado a partir do `.env.example`
+- **Local**: `http://localhost:3000/api`
