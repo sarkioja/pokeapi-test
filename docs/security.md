@@ -4,8 +4,16 @@
 
 - Header `X-API-Key: <chave>` obrigatório em todas as rotas, exceto `GET /api/health` e `GET /api` (Swagger)
 - Chaves configuradas via variável de ambiente `API_KEYS` (separadas por vírgula)
-- A aplicação **não sobe** se `API_KEYS` estiver vazio — validado no `ApiKeyGuard` na inicialização
+- A aplicação **não sobe** se `API_KEYS` estiver vazio — validado na inicialização
 - Em produção as chaves são definidas manualmente no dashboard do Render (`sync: false` no `render.yaml`)
+
+### Por que env var e não um sistema de chaves completo?
+
+Este projeto é uma prova de conceito. O objetivo principal é demonstrar arquitetura, não construir infraestrutura de autenticação. Usar `API_KEYS` como variável de ambiente é deliberadamente simples: funciona sem banco adicional, sem endpoints de gerenciamento e sem complexidade operacional. O suficiente para proteger a API enquanto o foco está em outras camadas.
+
+A contrapartida é conhecida: rotacionar uma chave exige redeploy, não há rastreabilidade por cliente e o comprimento mínimo é a única barreira de qualidade. Essas limitações são aceitáveis neste escopo.
+
+Quando o projeto evoluir para múltiplos clientes ou exigir rotação sem downtime, a seção [Evolução planejada](#evolução-planejada) descreve o caminho natural.
 
 ### Formato e requisitos das chaves
 
@@ -55,7 +63,7 @@ API_KEYS=a3f9c2e1b8d47f6c9e0a12b34c5d6e7f8a9b0c1d,b7e2a9f3c1d05e8b4f6a2c9d0e1f3b
 
 ### Evolução planejada
 
-A abordagem atual (env var) é adequada para o escopo do projeto. Para escalar com múltiplos clientes, o próximo passo seria uma tabela `api_keys` com SHA-256 hash, cache em memória com TTL, e endpoints de gerenciamento — eliminando a necessidade de redeploy para rotação de chaves.
+Quando a simplicidade da env var deixar de ser suficiente, o próximo passo natural é uma tabela `api_keys` com hash SHA-256, cache em memória com TTL e endpoints de gerenciamento. Isso eliminaria o redeploy para rotação de chaves e permitiria rastrear uso por cliente — sem mudar a interface HTTP (o header `X-API-Key` permanece o mesmo).
 
 ---
 
