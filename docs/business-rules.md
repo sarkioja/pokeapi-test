@@ -19,6 +19,19 @@ O registro não é apagado fisicamente — apenas marcado com `deleted_at`. Ao d
 
 O treinador pode ser restaurado via `PATCH /trainers/:id/restore`. Se outro usuário assumiu o mesmo e-mail enquanto o primeiro estava deletado, o restore retorna 409 (índice único parcial `WHERE deleted_at IS NULL`).
 
+### Restore em cascata
+
+O restore do treinador restaura automaticamente os times que foram deletados **na mesma transação** que o treinador, identificados pelo `deleted_at` idêntico. Times que já estavam deletados antes (deletados independentemente pelo usuário) **não são restaurados**.
+
+```
+PATCH /trainers/:id/restore
+  └── Restaura o Treinador
+  └── Restaura Times com deleted_at = trainer.deleted_at  ← mesma transação original
+  └── TeamPokemon nunca foram removidos (soft delete não dispara CASCADE)
+```
+
+Não existe restore individual de Time — se um time precisa ser reativado de forma isolada, a operação deve ser implementada como um endpoint próprio.
+
 > Por que soft delete e não `active: boolean`? Ver comparativo em [erd.md](erd.md).
 
 ---
