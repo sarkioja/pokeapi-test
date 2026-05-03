@@ -41,7 +41,7 @@ npm install
 
 ```bash
 cp .env.example .env
-# Edite API_KEYS com pelo menos uma chave (ex: minha-chave-dev)
+# API_KEYS aceita qualquer valor em desenvolvimento; veja docs/security.md para requisitos de produção
 ```
 
 ### 3. Subir o banco de dados
@@ -81,7 +81,7 @@ Swagger UI: `http://localhost:3000/api`
 | `DB_PASSWORD` | `postgres` | Senha |
 | `DB_NAME` | `pokeapi_dev` | Nome do banco |
 | `DATABASE_URL` | — | Connection string Neon (substitui as vars acima em produção) |
-| `API_KEYS` | **obrigatório** | Chaves de acesso separadas por vírgula |
+| `API_KEYS` | **obrigatório** | Chaves de acesso separadas por vírgula — mínimo 32 chars por chave em produção (ver [docs/security.md](docs/security.md)) |
 | `POKEAPI_BASE_URL` | `https://pokeapi.co/api/v2` | Base URL da PokéAPI |
 | `POKEMON_TTL_HOURS` | `24` | TTL do cache de pokémon (horas) |
 | `POKEMON_TYPE_TTL_DAYS` | `7` | TTL do cache de tipos (dias) |
@@ -89,7 +89,7 @@ Swagger UI: `http://localhost:3000/api`
 | `VIACEP_BASE_URL` | `https://viacep.com.br/ws` | Base URL do ViaCEP |
 | `CORS_ORIGINS` | `http://localhost:3000` | Origens CORS permitidas |
 
-> A aplicação **não sobe** se `API_KEYS` estiver vazio.
+> A aplicação **não sobe** se `API_KEYS` estiver vazio. Em `production`, chaves com menos de 32 caracteres também são rejeitadas.
 
 ---
 
