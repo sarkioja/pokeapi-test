@@ -228,3 +228,34 @@ ResourceNotFoundException       → 404 Not Found
 CepNotFoundExternalException    → 404 Not Found
 ExternalServiceException        → 502 Bad Gateway
 ```
+
+---
+
+## Estrutura de pastas
+
+```
+src/
+├── domain/          # Entidades, ports, exceções — sem dependências de framework
+├── application/     # Use cases — orquestram domínio e ports
+├── infrastructure/  # TypeORM, HTTP clients (PokéAPI, ViaCEP), config
+└── presentation/    # Controllers, DTOs, guards, filters
+```
+
+---
+
+## Integrações externas
+
+| Serviço | Endpoint | Uso |
+|---------|----------|-----|
+| **PokéAPI** | `/pokemon/:name` | Busca e cache de pokémon |
+| **PokéAPI** | `/type/:name` | Cache de efetividade de tipos para `/analysis` |
+| **ViaCEP** | `/:cep/json/` | Enriquecimento de endereço por CEP |
+
+---
+
+## Banco de dados
+
+- `synchronize: false` em todos os ambientes — somente migrations
+- Soft delete (`deleted_at`) em Trainers e Teams via `@DeleteDateColumn`
+- Índice único parcial em `trainers(email) WHERE deleted_at IS NULL` — permite restore sem conflito de e-mail
+- `UNIQUE(team_id, pokemon_id)` em `team_pokemon` — impede duplicatas no time

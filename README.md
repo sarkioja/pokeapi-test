@@ -91,175 +91,66 @@ Swagger UI: `http://localhost:3000/api`
 
 ## Diagramas
 
-| Diagrama | Arquivo |
-|----------|---------|
-| Modelo de banco de dados (ERD) | [docs/erd.md](docs/erd.md) |
-| Arquitetura em camadas + fluxo de cache | [docs/architecture.md](docs/architecture.md) |
+ERD (modelo de banco) e diagramas de arquitetura em camadas, sequências e fluxo de cache:
+
+→ [docs/erd.md](docs/erd.md)
+→ [docs/architecture.md](docs/architecture.md)
 
 ---
 
-## Endpoints `/api/v1`
+## Endpoints
 
-Todas as rotas exigem o header `X-API-Key: <chave>` — exceto `GET /api/health`.
+Trainers · Teams · Pokémon · Health — tabelas completas com métodos, rotas e status codes:
 
-### Trainers
-
-| Método | Rota | Status |
-|--------|------|--------|
-| `POST` | `/trainers` | 201, 400, 409 |
-| `GET` | `/trainers?limit&offset` | 200 |
-| `GET` | `/trainers/:id` | 200, 404 |
-| `PATCH` | `/trainers/:id` | 200, 400, 404 |
-| `PATCH` | `/trainers/:id/cep` | 200, 400, 404 |
-| `DELETE` | `/trainers/:id` | 204, 404 |
-| `PATCH` | `/trainers/:id/restore` | 200, 404, 409 |
-
-### Teams
-
-| Método | Rota | Status |
-|--------|------|--------|
-| `POST` | `/teams` | 201, 400, 404 |
-| `GET` | `/trainers/:trainerId/teams?limit&offset` | 200, 404 |
-| `GET` | `/teams/:id` | 200, 404 |
-| `PATCH` | `/teams/:id` | 200, 400, 404 |
-| `DELETE` | `/teams/:id` | 204, 404 |
-| `POST` | `/teams/:id/pokemon` | 201, 400, 404, 409, 422 |
-| `DELETE` | `/teams/:teamId/pokemon/:slotId` | 204, 404 |
-| `GET` | `/teams/:id/analysis` | 200, 404 |
-
-### Pokémon
-
-| Método | Rota | Status |
-|--------|------|--------|
-| `GET` | `/pokemon?limit&offset` | 200 |
-| `GET` | `/pokemon/:nameOrId` | 200, 404 |
-
-### Health
-
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| `GET` | `/api/health` | Status do banco (público, sem API Key) |
+→ [docs/endpoints.md](docs/endpoints.md)
 
 ---
 
 ## Regras de Negócio
 
-### Time × Pokémon
-- **Máximo 5 pokémon por time** → 422 `TEAM_FULL`
-- **Sem duplicatas no time** → 409 `DUPLICATE_POKEMON`
-- **Time arquivado não aceita pokémon** → 422 `TEAM_ARCHIVED`
+Limite de pokémon por time, soft delete de treinador, cache PokéAPI com fallback resiliente, integração ViaCEP e hierarquia de erros de domínio:
 
-### Exclusão de Treinador
-Soft delete — o registro não é apagado do banco, apenas marcado com `deleted_at`. A regra aplicada ao deletar um Treinador:
-1. Todos os times do treinador são soft-deletados (em transação)
-2. O treinador é soft-deletado
-3. `GET /trainers/:id` retorna 404 para registros soft-deletados
-
-O treinador pode ser restaurado via `PATCH /trainers/:id/restore`. Se outro usuário assumiu o mesmo e-mail enquanto o primeiro estava deletado, o restore retorna 409.
-
-> Alternativas consideradas: cascade físico (perda de histórico), bloqueio de exclusão (má UX). Soft delete foi escolhido por preservar auditoria e permitir restauração. Ver comparativo em [docs/erd.md](docs/erd.md).
-
-### Estratégia de Cache — PokéAPI
-- Pokémon é buscado na PokéAPI na primeira vez e persistido localmente
-- Requisições seguintes usam o dado local enquanto `fetched_at` estiver dentro do TTL (`POKEMON_TTL_HOURS`, padrão 24h)
-- Dado stale → nova busca na PokéAPI e upsert por `pokeapi_id`
-- **Fallback resiliente**: PokéAPI indisponível + dado local existente → retorna dado stale + warning no log (sem 503)
-
-Ver fluxo completo em [docs/architecture.md](docs/architecture.md).
-
-### Integração ViaCEP
-`PATCH /trainers/:id/cep` recebe um CEP, consulta o ViaCEP e persiste o endereço completo no Trainer:
-- CEP validado por regex (8 dígitos) antes de qualquer chamada externa → 400 se inválido
-- ViaCEP retorna HTTP 200 mesmo para CEP inexistente com `{ "erro": true }` no body — o adapter detecta esse caso e retorna 404
-- Endereço persistido: logradouro, bairro, cidade, estado
+→ [docs/business-rules.md](docs/business-rules.md)
 
 ---
 
 ## Arquitetura
 
-```
-src/
-├── domain/          # Entidades, ports, exceções — sem dependências de framework
-├── application/     # Use cases — orquestram domínio e ports
-├── infrastructure/  # TypeORM, HTTP clients (PokéAPI, ViaCEP), config
-└── presentation/    # Controllers, DTOs, guards, filters
-```
+Clean/Hexagonal Architecture, estrutura de pastas, integrações externas e decisões de modelagem:
 
-### Integrações Externas
-
-| Serviço | Uso |
-|---------|-----|
-| **PokéAPI** `/pokemon/:name` | Busca e cache de pokémon |
-| **PokéAPI** `/type/:name` | Cache de efetividade de tipos para `/analysis` |
-| **ViaCEP** | Enriquecimento de endereço por CEP |
-
-### Banco de Dados
-
-- `synchronize: false` em todos os ambientes — somente migrations
-- Soft delete (`deleted_at`) em Trainers e Teams
-- Índice único parcial em `trainers(email) WHERE deleted_at IS NULL` — permite restore sem conflito de email
-- `UNIQUE(team_id, pokemon_id)` em `team_pokemon`
+→ [docs/architecture.md](docs/architecture.md)
 
 ---
 
 ## Convenções Git
 
-Veja [docs/git-conventions.md](docs/git-conventions.md) para:
+Conventional Commits, Trunk-Based Development adaptado e hooks Husky (pre-commit: lint + typecheck, pre-push: unit tests):
 
-- Padrão de mensagens de commit (Conventional Commits)
-- Estratégia de branches (Trunk-Based Development adaptado)
-- Hooks locais via Husky (pre-commit: lint + typecheck, pre-push: unit tests)
+→ [docs/git-conventions.md](docs/git-conventions.md)
 
 ---
 
 ## Testes
 
-```bash
-# Unitários (sem banco)
-npm run test:unit
+Comandos, isolamento via schema PostgreSQL `test`, cobertura atual (74 testes):
 
-# Integração (banco real — schema 'test' isolado)
-npm run test:integration
-
-# E2E (AppModule completo — schema 'test' isolado)
-npm run test:e2e
-```
-
-Os testes de integração e E2E usam o schema PostgreSQL `test` dentro do banco `pokeapi_dev`.  
-O `globalSetup` recria o schema e aplica migrations antes de cada run — **dados em `public.*` nunca são afetados**.
-
-### Cobertura atual
-
-| Suite | Testes |
-|-------|--------|
-| Unit | 28 |
-| Integration | 13 |
-| E2E | 33 |
-| **Total** | **74** |
+→ [docs/testing.md](docs/testing.md)
 
 ---
 
 ## Migrations
 
-```bash
-# Gerar nova migration a partir das entidades
-npm run migration:generate -- src/infrastructure/database/typeorm/migrations/NomeDaMigration
+Comandos de geração, aplicação e reversão; índices especiais; fluxo de deploy:
 
-# Aplicar migrations pendentes
-npm run migration:run
-
-# Reverter última migration
-npm run migration:revert
-```
+→ [docs/migrations.md](docs/migrations.md)
 
 ---
 
 ## Segurança
 
-- `X-API-Key` obrigatório em todas as rotas (exceto `/api/health` e `/api` Swagger)
-- `@nestjs/throttler` — 100 req/min por IP
-- `helmet` — headers de segurança HTTP
-- CORS configurável via `CORS_ORIGINS`
+API Key, rate limiting, helmet, CORS e Swagger UI:
+
+→ [docs/security.md](docs/security.md)
 
 ---
 
