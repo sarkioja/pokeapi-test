@@ -1,0 +1,23 @@
+meta {
+  name: Update Team
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/teams/{{teamId}}
+  body: json
+  auth: none
+}
+
+headers {
+  X-API-Key: {{apiKey}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Elite Four Squad",
+    "status": "active"
+  }
+}

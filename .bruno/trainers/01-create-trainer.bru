@@ -1,0 +1,24 @@
+meta {
+  name: Create Trainer
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/v1/trainers
+  body: json
+  auth: none
+}
+
+headers {
+  X-API-Key: {{apiKey}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Ash Ketchum",
+    "email": "ash@pokemon.com",
+    "favoritePokeapiId": 25
+  }
+}

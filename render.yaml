@@ -1,0 +1,78 @@
+services:
+  # -------------------------------------------------------------------
+  # Develop environment — branch: develop
+  # -------------------------------------------------------------------
+  - type: web
+    name: pokeapi-test-dev
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    branch: develop
+    region: oregon
+    plan: free
+    healthCheckPath: /api/health
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: pokeapi-neon-dev
+          property: connectionString
+      - key: POKEAPI_BASE_URL
+        value: https://pokeapi.co/api/v2
+      - key: VIACEP_BASE_URL
+        value: https://viacep.com.br/ws
+      - key: POKEMON_TTL_HOURS
+        value: 24
+      - key: POKEMON_TYPE_TTL_DAYS
+        value: 7
+      - key: HTTP_TIMEOUT_MS
+        value: 5000
+      - key: CORS_ORIGINS
+        value: '*'
+      - key: LOG_LEVEL
+        value: info
+      - key: API_KEYS
+        sync: false   # Set manually in Render dashboard (secret)
+
+  # -------------------------------------------------------------------
+  # Production environment — branch: main
+  # -------------------------------------------------------------------
+  - type: web
+    name: pokeapi-test-prod
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    branch: main
+    region: oregon
+    plan: free
+    healthCheckPath: /api/health
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: pokeapi-neon-prod
+          property: connectionString
+      - key: POKEAPI_BASE_URL
+        value: https://pokeapi.co/api/v2
+      - key: VIACEP_BASE_URL
+        value: https://viacep.com.br/ws
+      - key: POKEMON_TTL_HOURS
+        value: 24
+      - key: POKEMON_TYPE_TTL_DAYS
+        value: 7
+      - key: HTTP_TIMEOUT_MS
+        value: 5000
+      - key: CORS_ORIGINS
+        value: '*'
+      - key: LOG_LEVEL
+        value: warn
+      - key: API_KEYS
+        sync: false   # Set manually in Render dashboard (secret)

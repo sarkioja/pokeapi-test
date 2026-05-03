@@ -1,0 +1,67 @@
+import { Inject, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Pokemon } from '../../../domain/pokemon/pokemon.entity';
+import {
+  POKEMON_REPOSITORY,
+  PokemonRepositoryPort,
+} from '../../../domain/pokemon/pokemon.repository.port';
+import { POKEAPI_PORT, PokeApiPort } from '../../../domain/ports/pokeapi.port';
+import {
+  ResourceNotFoundException,
+  ExternalServiceException,
+} from '../../../domain/exceptions/external-service.exception';
+
+export class GetOrFetchPokemonUseCase {
+  private readonly logger = new Logger(GetOrFetchPokemonUseCase.name);
+  private readonly ttlMs: number;
+
+  constructor(
+    @Inject(POKEMON_REPOSITORY)
+    private readonly pokemonRepository: PokemonRepositoryPort,
+    @Inject(POKEAPI_PORT)
+    private readonly pokeApi: PokeApiPort,
+    private readonly config: ConfigService,
+  ) {
+    const ttlHours = Number(this.config.get<number>('POKEMON_TTL_HOURS', 24));
+    this.ttlMs = ttlHours * 60 * 60 * 1000;
+  }
+
+  async executeByName(name: string): Promise<Pokemon> {
+    const existing = await this.pokemonRepository.findByName(name.toLowerCase());
+    return this.resolveWithFallback(existing, () => this.pokeApi.fetchPokemonByName(name));
+  }
+
+  async executeById(pokeapiId: number): Promise<Pokemon> {
+    const existing = await this.pokemonRepository.findByPokeapiId(pokeapiId);
+    return this.resolveWithFallback(existing, () => this.pokeApi.fetchPokemonById(pokeapiId));
+  }
+
+  private async resolveWithFallback(
+    existing: Pokemon | null,
+    fetch: () => ReturnType<PokeApiPort['fetchPokemonByName']>,
+  ): Promise<Pokemon> {
+    const isFresh = existing && Date.now() - existing.fetchedAt.getTime() < this.ttlMs;
+
+    if (isFresh) {
+      return existing;
+    }
+
+    try {
+      const data = await fetch();
+      return this.pokemonRepository.upsertByPokeapiId({
+        ...data,
+        fetchedAt: new Date(),
+      });
+    } catch (err) {
+      if (existing) {
+        this.logger.warn(
+          `PokéAPI unavailable; serving stale data for pokémon (fetched ${existing.fetchedAt.toISOString()})`,
+        );
+        return existing;
+      }
+      if (err instanceof ResourceNotFoundException) throw err;
+      if (err instanceof ExternalServiceException) throw err;
+      throw new ExternalServiceException('PokéAPI', (err as Error).message);
+    }
+  }
+}

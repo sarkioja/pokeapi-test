@@ -1,0 +1,20 @@
+meta {
+  name: List Trainers
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/v1/trainers
+  body: none
+  auth: none
+}
+
+headers {
+  X-API-Key: {{apiKey}}
+}
+
+params:query {
+  limit: 10
+  offset: 0
+}

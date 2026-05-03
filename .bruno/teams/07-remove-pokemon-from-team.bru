@@ -1,0 +1,15 @@
+meta {
+  name: Remove Pokemon from Team
+  type: http
+  seq: 7
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/teams/{{teamId}}/pokemon/{{pokemonId}}
+  body: none
+  auth: none
+}
+
+headers {
+  X-API-Key: {{apiKey}}
+}

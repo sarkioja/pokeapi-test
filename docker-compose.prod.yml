@@ -1,0 +1,46 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: pokeapi_postgres_prod
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${DB_USERNAME} -d ${DB_NAME}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    image: ghcr.io/sarkioja/pokeapi-test:latest
+    container_name: pokeapi_app_prod
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: ${PORT:-3000}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      POKEAPI_BASE_URL: ${POKEAPI_BASE_URL}
+      POKEMON_TTL_HOURS: ${POKEMON_TTL_HOURS:-24}
+      POKEMON_TYPE_TTL_DAYS: ${POKEMON_TYPE_TTL_DAYS:-7}
+      HTTP_TIMEOUT_MS: ${HTTP_TIMEOUT_MS:-5000}
+      VIACEP_BASE_URL: ${VIACEP_BASE_URL}
+      API_KEYS: ${API_KEYS}
+      CORS_ORIGINS: ${CORS_ORIGINS}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    ports:
+      - '${PORT:-3000}:3000'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: sh -c "npm run migration:run:prod && npm run start:prod"
+
+volumes:
+  postgres_data_prod:

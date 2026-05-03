@@ -1,0 +1,15 @@
+meta {
+  name: Restore Trainer
+  type: http
+  seq: 7
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/trainers/{{trainerId}}/restore
+  body: none
+  auth: none
+}
+
+headers {
+  X-API-Key: {{apiKey}}
+}

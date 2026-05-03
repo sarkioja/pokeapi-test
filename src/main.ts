@@ -18,7 +18,17 @@ async function bootstrap() {
     throw new Error('API_KEYS environment variable is required and cannot be empty');
   }
 
-  app.use(helmet());
+  app.use(
+    helmet({
+      hsts: false, // managed at Render load-balancer level
+      contentSecurityPolicy: {
+        useDefaults: true,
+        directives: {
+          upgradeInsecureRequests: null, // remove upgrade-insecure-requests so Safari doesn't force HTTP→HTTPS on localhost
+        },
+      },
+    }),
+  );
 
   const corsOrigins = config.get<string>('CORS_ORIGINS', 'http://localhost:3000');
   app.enableCors({
@@ -53,4 +63,7 @@ async function bootstrap() {
   console.log(`Swagger UI: http://localhost:${port}/api`);
 }
 
-bootstrap();
+bootstrap().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

@@ -1,0 +1,20 @@
+meta {
+  name: List Teams by Trainer
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/v1/trainers/{{trainerId}}/teams
+  body: none
+  auth: none
+}
+
+headers {
+  X-API-Key: {{apiKey}}
+}
+
+params:query {
+  limit: 10
+  offset: 0
+}
