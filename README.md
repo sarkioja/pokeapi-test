@@ -89,6 +89,15 @@ Swagger UI: `http://localhost:3000/api`
 
 ---
 
+## Diagramas
+
+| Diagrama | Arquivo |
+|----------|---------|
+| Modelo de banco de dados (ERD) | [docs/erd.md](docs/erd.md) |
+| Arquitetura em camadas + fluxo de cache | [docs/architecture.md](docs/architecture.md) |
+
+---
+
 ## Endpoints `/api/v1`
 
 Todas as rotas exigem o header `X-API-Key: <chave>` — exceto `GET /api/health`.
@@ -135,12 +144,34 @@ Todas as rotas exigem o header `X-API-Key: <chave>` — exceto `GET /api/health`
 
 ## Regras de Negócio
 
+### Time × Pokémon
 - **Máximo 5 pokémon por time** → 422 `TEAM_FULL`
 - **Sem duplicatas no time** → 409 `DUPLICATE_POKEMON`
 - **Time arquivado não aceita pokémon** → 422 `TEAM_ARCHIVED`
-- **Soft delete de Trainer** cascateia para seus times (transação)
-- **Cache de Pokémon** → TTL configurável via `POKEMON_TTL_HOURS`; se a PokéAPI estiver indisponível e houver dado local, retorna o dado stale com warning no log
-- **CEP** → validado por regex; ViaCEP consultado para enriquecer endereço; `{ erro: true }` no body vira 404
+
+### Exclusão de Treinador
+Soft delete — o registro não é apagado do banco, apenas marcado com `deleted_at`. A regra aplicada ao deletar um Treinador:
+1. Todos os times do treinador são soft-deletados (em transação)
+2. O treinador é soft-deletado
+3. `GET /trainers/:id` retorna 404 para registros soft-deletados
+
+O treinador pode ser restaurado via `PATCH /trainers/:id/restore`. Se outro usuário assumiu o mesmo e-mail enquanto o primeiro estava deletado, o restore retorna 409.
+
+> Alternativas consideradas: cascade físico (perda de histórico), bloqueio de exclusão (má UX). Soft delete foi escolhido por preservar auditoria e permitir restauração. Ver comparativo em [docs/erd.md](docs/erd.md).
+
+### Estratégia de Cache — PokéAPI
+- Pokémon é buscado na PokéAPI na primeira vez e persistido localmente
+- Requisições seguintes usam o dado local enquanto `fetched_at` estiver dentro do TTL (`POKEMON_TTL_HOURS`, padrão 24h)
+- Dado stale → nova busca na PokéAPI e upsert por `pokeapi_id`
+- **Fallback resiliente**: PokéAPI indisponível + dado local existente → retorna dado stale + warning no log (sem 503)
+
+Ver fluxo completo em [docs/architecture.md](docs/architecture.md).
+
+### Integração ViaCEP
+`PATCH /trainers/:id/cep` recebe um CEP, consulta o ViaCEP e persiste o endereço completo no Trainer:
+- CEP validado por regex (8 dígitos) antes de qualquer chamada externa → 400 se inválido
+- ViaCEP retorna HTTP 200 mesmo para CEP inexistente com `{ "erro": true }` no body — o adapter detecta esse caso e retorna 404
+- Endereço persistido: logradouro, bairro, cidade, estado
 
 ---
 
@@ -224,6 +255,9 @@ npm run migration:revert
 
 ## Acesso à API de teste
 
-> **Em breve** — links e chaves de acesso ao ambiente `develop` serão adicionados após o deploy no Render + Neon.
+> **Em breve** — URL e chaves do ambiente `develop` (Render + Neon) serão adicionadas após o deploy.
 
-Para explorar os endpoints localmente, use o Swagger UI em `http://localhost:3000/api` ou a coleção Bruno em `.bruno/`.
+Para explorar os endpoints localmente:
+- **Swagger UI**: `http://localhost:3000/api`
+- **Bruno collection**: pasta `.bruno/` (importe no app [Bruno](https://www.usebruno.com/))
+- **API Key padrão local**: `change-me-dev-key-1` (configurada no `.env.example`)
