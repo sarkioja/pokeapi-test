@@ -1,8 +1,12 @@
 # pokeapi-test
 
-REST API para gerenciar Treinadores, Times e Pokémon.
+API REST construída como prova de conceito de Clean/Hexagonal Architecture em NestJS com TypeScript. O domínio de Pokémon é um pretexto: o objetivo real é demonstrar como organizar uma aplicação backend onde regras de negócio, infraestrutura e integrações externas ficam isoladas entre si e podem evoluir de forma independente.
 
-Construído com **NestJS · TypeORM · PostgreSQL** seguindo Clean/Hexagonal Architecture.
+A API gerencia treinadores, seus times e os pokémon que os compõem. Duas integrações externas entram nessa equação com propósitos distintos.
+
+A [PokéAPI](https://pokeapi.co) é uma API pública com dados de toda a franquia Pokémon. Aqui ela serve de fonte para buscar e armazenar dados de pokémon sob demanda, com cache local no PostgreSQL e TTL configurável. Quando a PokéAPI está indisponível, o sistema entrega os dados em cache com uma advertência em vez de falhar a requisição.
+
+O [ViaCEP](https://viacep.com.br) é um serviço gratuito de consulta de CEPs brasileiros. Ao cadastrar um CEP, o perfil do treinador é enriquecido com o endereço completo buscado na hora. É uma integração mais simples, mas mostra como tratar uma dependência externa com validação no domínio e tratamento de erros próprio.
 
 ---
 
