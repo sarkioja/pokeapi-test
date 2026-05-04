@@ -15,28 +15,28 @@ import { PokemonOrmEntity } from './pokemon.orm-entity';
 @Unique(['teamId', 'slot'])
 export class TeamPokemonOrmEntity {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  declare id: string;
 
   @Column({ name: 'team_id', type: 'uuid' })
-  teamId: string;
+  declare teamId: string;
 
   @Column({ name: 'pokemon_id', type: 'uuid' })
-  pokemonId: string;
+  declare pokemonId: string;
 
   @Column({ type: 'integer' })
-  slot: number;
+  declare slot: number;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  nickname: string | null;
+  declare nickname: string | null;
 
   @CreateDateColumn({ name: 'added_at' })
-  addedAt: Date;
+  declare addedAt: Date;
 
   @ManyToOne(() => TeamOrmEntity, (team) => team.teamPokemon, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'team_id' })
-  team: TeamOrmEntity;
+  declare team: TeamOrmEntity;
 
   @ManyToOne(() => PokemonOrmEntity, (pokemon) => pokemon.teamPokemon, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'pokemon_id' })
-  pokemon: PokemonOrmEntity;
+  declare pokemon: PokemonOrmEntity;
 }
