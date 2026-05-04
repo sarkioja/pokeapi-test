@@ -17,33 +17,33 @@ import { TeamPokemonOrmEntity } from './team-pokemon.orm-entity';
 @Index(['trainerId'])
 export class TeamOrmEntity {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  declare id: string;
 
   @Column({ type: 'varchar', length: 255 })
-  name: string;
+  declare name: string;
 
   @Column({ type: 'varchar', length: 20, default: 'active' })
-  status: string;
+  declare status: string;
 
   @Column({ name: 'trainer_id', type: 'uuid', nullable: true })
-  trainerId: string | null;
+  declare trainerId: string | null;
 
   @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
+  declare createdAt: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt: Date;
+  declare updatedAt: Date;
 
   @DeleteDateColumn({ name: 'deleted_at' })
-  deletedAt: Date | null;
+  declare deletedAt: Date | null;
 
   @ManyToOne(() => TrainerOrmEntity, (trainer) => trainer.teams, {
     onDelete: 'SET NULL',
     nullable: true,
   })
   @JoinColumn({ name: 'trainer_id' })
-  trainer: TrainerOrmEntity;
+  declare trainer: TrainerOrmEntity;
 
   @OneToMany(() => TeamPokemonOrmEntity, (tp) => tp.team)
-  teamPokemon: TeamPokemonOrmEntity[];
+  declare teamPokemon: TeamPokemonOrmEntity[];
 }
