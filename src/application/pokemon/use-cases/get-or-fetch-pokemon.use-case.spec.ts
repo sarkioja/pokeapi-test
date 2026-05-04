@@ -45,7 +45,15 @@ const makePokeApi = (): jest.Mocked<PokeApiPort> => ({
   fetchTypeEffectiveness: jest.fn(),
 });
 
-const makeConfig = (ttlHours = 24) => ({ get: jest.fn().mockReturnValue(ttlHours) });
+const makeConfig = (ttlHours = 24) => ({
+  getPokemonTtlHours: jest.fn().mockReturnValue(ttlHours),
+  getPokemonTypeTtlDays: jest.fn().mockReturnValue(7),
+});
+
+const makeLogger = () => ({
+  warn: jest.fn(),
+  error: jest.fn(),
+});
 
 describe('GetOrFetchPokemonUseCase', () => {
   let useCase: GetOrFetchPokemonUseCase;
@@ -55,7 +63,7 @@ describe('GetOrFetchPokemonUseCase', () => {
   beforeEach(() => {
     repo = makeRepo();
     pokeApi = makePokeApi();
-    useCase = new GetOrFetchPokemonUseCase(repo, pokeApi, makeConfig() as any);
+    useCase = new GetOrFetchPokemonUseCase(repo, pokeApi, makeConfig(), makeLogger());
   });
 
   describe('executeByName', () => {

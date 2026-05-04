@@ -1,4 +1,7 @@
 import { TeamPokemon } from '../team-pokemon/team-pokemon.entity';
+import { DuplicatePokemonException } from '../exceptions/duplicate-pokemon.exception';
+import { TeamArchivedException } from '../exceptions/team-archived.exception';
+import { TeamFullException } from '../exceptions/team-full.exception';
 
 export type TeamStatus = 'active' | 'archived';
 
@@ -29,5 +32,22 @@ export class Team {
 
   hasSlot(slotId: string): boolean {
     return this.pokemon.some((tp) => tp.id === slotId);
+  }
+
+  assertCanAddPokemon(pokemonId: string): void {
+    this.assertCanReceivePokemon();
+    if (this.hasPokemon(pokemonId)) throw new DuplicatePokemonException();
+  }
+
+  assertCanReceivePokemon(): void {
+    if (this.isArchived()) throw new TeamArchivedException();
+    if (this.isFull()) throw new TeamFullException();
+  }
+
+  nextAvailableSlot(): number {
+    const usedSlots = new Set(this.pokemon.map((tp) => tp.slot));
+    let nextSlot = 1;
+    while (usedSlots.has(nextSlot)) nextSlot++;
+    return nextSlot;
   }
 }

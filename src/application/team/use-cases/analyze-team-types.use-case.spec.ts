@@ -73,6 +73,16 @@ const makePokeApi = (): jest.Mocked<PokeApiPort> => ({
   fetchTypeEffectiveness: jest.fn(),
 });
 
+const makeConfig = () => ({
+  getPokemonTtlHours: jest.fn().mockReturnValue(24),
+  getPokemonTypeTtlDays: jest.fn().mockReturnValue(7),
+});
+
+const makeLogger = () => ({
+  warn: jest.fn(),
+  error: jest.fn(),
+});
+
 describe('AnalyzeTeamTypesUseCase', () => {
   let useCase: AnalyzeTeamTypesUseCase;
   let teamRepo: jest.Mocked<TeamRepositoryPort>;
@@ -83,9 +93,13 @@ describe('AnalyzeTeamTypesUseCase', () => {
     teamRepo = makeTeamRepo();
     pokemonRepo = makePokemonRepo();
     pokeApi = makePokeApi();
-    useCase = new AnalyzeTeamTypesUseCase(teamRepo, pokemonRepo, pokeApi, {
-      get: jest.fn().mockReturnValue(7),
-    } as any);
+    useCase = new AnalyzeTeamTypesUseCase(
+      teamRepo,
+      pokemonRepo,
+      pokeApi,
+      makeConfig(),
+      makeLogger(),
+    );
   });
 
   it('throws ResourceNotFoundException when team does not exist', async () => {

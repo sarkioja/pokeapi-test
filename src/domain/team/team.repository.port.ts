@@ -15,8 +15,6 @@ export interface TeamPage {
   total: number;
 }
 
-export const TEAM_REPOSITORY = 'TEAM_REPOSITORY';
-
 export interface TeamRepositoryPort {
   create(data: CreateTeamData): Promise<Team>;
   findById(id: string): Promise<Team | null>;

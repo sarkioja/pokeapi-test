@@ -84,6 +84,16 @@ export class TrainerTypeOrmRepository implements TrainerRepositoryPort {
     await this.repo.softDelete(id);
   }
 
+  async softDeleteWithTeams(id: string, deletedAt: Date): Promise<void> {
+    await this.repo.manager.transaction(async (manager) => {
+      await manager.query(
+        `UPDATE teams SET deleted_at = $1 WHERE trainer_id = $2 AND deleted_at IS NULL`,
+        [deletedAt, id],
+      );
+      await manager.query(`UPDATE trainers SET deleted_at = $1 WHERE id = $2`, [deletedAt, id]);
+    });
+  }
+
   async restore(id: string): Promise<Trainer> {
     await this.repo.restore(id);
     const restored = await this.repo.findOne({ where: { id } });

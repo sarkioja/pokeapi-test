@@ -18,6 +18,7 @@ const config: Config = {
     '^@presentation/(.*)$': '<rootDir>/src/presentation/$1',
     '^@shared/(.*)$': '<rootDir>/src/shared/$1',
   },
+  modulePathIgnorePatterns: ['<rootDir>/.claude/'],
 };
 
 export default config;

@@ -1,13 +1,10 @@
-import { Inject, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { TEAM_REPOSITORY, TeamRepositoryPort } from '../../../domain/team/team.repository.port';
-import {
-  POKEMON_REPOSITORY,
-  PokemonRepositoryPort,
-} from '../../../domain/pokemon/pokemon.repository.port';
-import { POKEAPI_PORT, PokeApiPort } from '../../../domain/ports/pokeapi.port';
+import { TeamRepositoryPort } from '../../../domain/team/team.repository.port';
+import { PokemonRepositoryPort } from '../../../domain/pokemon/pokemon.repository.port';
+import { PokeApiPort } from '../../../domain/ports/pokeapi.port';
 import { DamageRelations } from '../../../domain/pokemon/pokemon-type.entity';
 import { ResourceNotFoundException } from '../../../domain/exceptions/external-service.exception';
+import { PokemonCacheConfigPort } from '../../ports/pokemon-cache-config.port';
+import { LoggerPort } from '../../ports/logger.port';
 
 export interface TypeAnalysis {
   weaknesses: string[];
@@ -16,19 +13,16 @@ export interface TypeAnalysis {
 }
 
 export class AnalyzeTeamTypesUseCase {
-  private readonly logger = new Logger(AnalyzeTeamTypesUseCase.name);
   private readonly typeTtlMs: number;
 
   constructor(
-    @Inject(TEAM_REPOSITORY)
     private readonly teamRepository: TeamRepositoryPort,
-    @Inject(POKEMON_REPOSITORY)
     private readonly pokemonRepository: PokemonRepositoryPort,
-    @Inject(POKEAPI_PORT)
     private readonly pokeApi: PokeApiPort,
-    private readonly config: ConfigService,
+    config: PokemonCacheConfigPort,
+    private readonly logger: LoggerPort,
   ) {
-    const ttlDays = Number(this.config.get<number>('POKEMON_TYPE_TTL_DAYS', 7));
+    const ttlDays = config.getPokemonTypeTtlDays();
     this.typeTtlMs = ttlDays * 24 * 60 * 60 * 1000;
   }
 

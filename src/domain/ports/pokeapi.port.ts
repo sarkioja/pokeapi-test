@@ -10,8 +10,6 @@ export interface PokeApiPokemonData {
   weight: number | null;
 }
 
-export const POKEAPI_PORT = 'POKEAPI_PORT';
-
 export interface PokeApiPort {
   fetchPokemonByName(name: string): Promise<PokeApiPokemonData>;
   fetchPokemonById(pokeapiId: number): Promise<PokeApiPokemonData>;

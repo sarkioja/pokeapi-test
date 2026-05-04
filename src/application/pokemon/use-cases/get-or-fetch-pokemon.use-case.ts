@@ -1,28 +1,23 @@
-import { Inject, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { Pokemon } from '../../../domain/pokemon/pokemon.entity';
-import {
-  POKEMON_REPOSITORY,
-  PokemonRepositoryPort,
-} from '../../../domain/pokemon/pokemon.repository.port';
-import { POKEAPI_PORT, PokeApiPort } from '../../../domain/ports/pokeapi.port';
+import { PokemonRepositoryPort } from '../../../domain/pokemon/pokemon.repository.port';
+import { PokeApiPort } from '../../../domain/ports/pokeapi.port';
 import {
   ResourceNotFoundException,
   ExternalServiceException,
 } from '../../../domain/exceptions/external-service.exception';
+import { PokemonCacheConfigPort } from '../../ports/pokemon-cache-config.port';
+import { LoggerPort } from '../../ports/logger.port';
 
 export class GetOrFetchPokemonUseCase {
-  private readonly logger = new Logger(GetOrFetchPokemonUseCase.name);
   private readonly ttlMs: number;
 
   constructor(
-    @Inject(POKEMON_REPOSITORY)
     private readonly pokemonRepository: PokemonRepositoryPort,
-    @Inject(POKEAPI_PORT)
     private readonly pokeApi: PokeApiPort,
-    private readonly config: ConfigService,
+    config: PokemonCacheConfigPort,
+    private readonly logger: LoggerPort,
   ) {
-    const ttlHours = Number(this.config.get<number>('POKEMON_TTL_HOURS', 24));
+    const ttlHours = config.getPokemonTtlHours();
     this.ttlMs = ttlHours * 60 * 60 * 1000;
   }
 
