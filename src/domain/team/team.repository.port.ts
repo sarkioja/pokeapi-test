@@ -24,5 +24,5 @@ export interface TeamRepositoryPort {
   softDelete(id: string): Promise<void>;
   softDeleteByTrainerId(trainerId: string): Promise<void>;
   addPokemon(teamId: string, pokemonId: string, slot: number, nickname?: string): Promise<void>;
-  removePokemon(teamId: string, pokemonId: string): Promise<void>;
+  removePokemon(teamId: string, slotId: string): Promise<void>;
 }

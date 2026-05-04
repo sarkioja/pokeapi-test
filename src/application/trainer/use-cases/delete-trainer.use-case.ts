@@ -1,5 +1,5 @@
 import { TrainerRepositoryPort } from '../../../domain/trainer/trainer.repository.port';
-import { ResourceNotFoundException } from '../../../domain/exceptions/external-service.exception';
+import { ResourceNotFoundException } from '../../../domain/exceptions/resource-not-found.exception';
 
 export class DeleteTrainerUseCase {
   constructor(private readonly trainerRepository: TrainerRepositoryPort) {}
@@ -8,6 +8,6 @@ export class DeleteTrainerUseCase {
     const trainer = await this.trainerRepository.findById(id);
     if (!trainer) throw new ResourceNotFoundException('Trainer', id);
 
-    await this.trainerRepository.softDeleteWithTeams(id, new Date());
+    await this.trainerRepository.softDeleteWithTeams(id);
   }
 }

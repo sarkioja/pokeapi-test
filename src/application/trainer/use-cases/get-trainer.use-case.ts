@@ -3,7 +3,7 @@ import {
   TrainerRepositoryPort,
   TrainerPage,
 } from '../../../domain/trainer/trainer.repository.port';
-import { ResourceNotFoundException } from '../../../domain/exceptions/external-service.exception';
+import { ResourceNotFoundException } from '../../../domain/exceptions/resource-not-found.exception';
 
 export class GetTrainerUseCase {
   constructor(private readonly trainerRepository: TrainerRepositoryPort) {}

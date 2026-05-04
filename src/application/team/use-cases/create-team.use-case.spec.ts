@@ -3,7 +3,7 @@ import { TeamRepositoryPort } from '../../../domain/team/team.repository.port';
 import { TrainerRepositoryPort } from '../../../domain/trainer/trainer.repository.port';
 import { Team } from '../../../domain/team/team.entity';
 import { Trainer } from '../../../domain/trainer/trainer.entity';
-import { ResourceNotFoundException } from '../../../domain/exceptions/external-service.exception';
+import { ResourceNotFoundException } from '../../../domain/exceptions/resource-not-found.exception';
 
 const makeTrainer = (): Trainer =>
   new Trainer(

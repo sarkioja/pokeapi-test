@@ -1,6 +1,6 @@
 import { Team } from '../../../domain/team/team.entity';
 import { TeamRepositoryPort } from '../../../domain/team/team.repository.port';
-import { ResourceNotFoundException } from '../../../domain/exceptions/external-service.exception';
+import { ResourceNotFoundException } from '../../../domain/exceptions/resource-not-found.exception';
 import { GetOrFetchPokemonUseCase } from '../../pokemon/use-cases/get-or-fetch-pokemon.use-case';
 
 export class AddPokemonToTeamUseCase {

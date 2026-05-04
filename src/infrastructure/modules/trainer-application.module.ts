@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { TRAINER_REPOSITORY, VIACEP_PORT } from '../../application/di/tokens';
+import { TRAINER_REPOSITORY, VIACEP_PORT } from '../../domain/di/tokens';
 import { TrainerRepositoryPort } from '../../domain/trainer/trainer.repository.port';
 import { ViaCepPort } from '../../domain/ports/viacep.port';
 import { TrainerPersistenceModule } from '../database/typeorm/trainer-persistence.module';

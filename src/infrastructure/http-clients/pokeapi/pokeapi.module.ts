@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { PokeApiClient } from './pokeapi.client';
-import { POKEAPI_PORT } from '../../../application/di/tokens';
+import { POKEAPI_PORT } from '../../../domain/di/tokens';
 
 @Module({
   providers: [{ provide: POKEAPI_PORT, useClass: PokeApiClient }],

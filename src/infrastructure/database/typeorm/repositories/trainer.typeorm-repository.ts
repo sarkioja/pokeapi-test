@@ -12,7 +12,7 @@ import {
 } from '../../../../domain/trainer/trainer.repository.port';
 import { AddressData } from '../../../../domain/shared/address-data';
 import { Trainer } from '../../../../domain/trainer/trainer.entity';
-import { ResourceNotFoundException } from '../../../../domain/exceptions/external-service.exception';
+import { ResourceNotFoundException } from '../../../../domain/exceptions/resource-not-found.exception';
 
 @Injectable()
 export class TrainerTypeOrmRepository implements TrainerRepositoryPort {
@@ -84,7 +84,8 @@ export class TrainerTypeOrmRepository implements TrainerRepositoryPort {
     await this.repo.softDelete(id);
   }
 
-  async softDeleteWithTeams(id: string, deletedAt: Date): Promise<void> {
+  async softDeleteWithTeams(id: string): Promise<void> {
+    const deletedAt = new Date();
     await this.repo.manager.transaction(async (manager) => {
       await manager.query(
         `UPDATE teams SET deleted_at = $1 WHERE trainer_id = $2 AND deleted_at IS NULL`,

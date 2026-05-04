@@ -27,7 +27,7 @@ export interface TrainerRepositoryPort {
   update(id: string, data: UpdateTrainerData): Promise<Trainer>;
   updateAddress(id: string, address: AddressData): Promise<Trainer>;
   softDelete(id: string): Promise<void>;
-  softDeleteWithTeams(id: string, deletedAt: Date): Promise<void>;
+  softDeleteWithTeams(id: string): Promise<void>;
   restore(id: string): Promise<Trainer>;
   restoreWithTeams(id: string): Promise<Trainer>;
   existsActiveByEmail(email: string, excludeId?: string): Promise<boolean>;

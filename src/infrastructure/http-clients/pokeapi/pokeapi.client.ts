@@ -3,10 +3,8 @@ import { ConfigService } from '@nestjs/config';
 import axios, { AxiosError, AxiosInstance } from 'axios';
 import { PokeApiPort, PokeApiPokemonData } from '../../../domain/ports/pokeapi.port';
 import { DamageRelations } from '../../../domain/pokemon/pokemon-type.entity';
-import {
-  ExternalServiceException,
-  ResourceNotFoundException,
-} from '../../../domain/exceptions/external-service.exception';
+import { ExternalServiceException } from '../../../domain/exceptions/external-service.exception';
+import { ResourceNotFoundException } from '../../../domain/exceptions/resource-not-found.exception';
 import {
   PokeApiPokemonResponseDto,
   PokeApiTypeResponseDto,

@@ -1,7 +1,7 @@
 import { DeleteTrainerUseCase } from './delete-trainer.use-case';
 import { TrainerRepositoryPort } from '../../../domain/trainer/trainer.repository.port';
 import { Trainer } from '../../../domain/trainer/trainer.entity';
-import { ResourceNotFoundException } from '../../../domain/exceptions/external-service.exception';
+import { ResourceNotFoundException } from '../../../domain/exceptions/resource-not-found.exception';
 
 const makeTrainer = (): Trainer =>
   new Trainer(
@@ -55,6 +55,6 @@ describe('DeleteTrainerUseCase', () => {
 
     await useCase.execute('id-1');
 
-    expect(repo.softDeleteWithTeams).toHaveBeenCalledWith('id-1', expect.any(Date));
+    expect(repo.softDeleteWithTeams).toHaveBeenCalledWith('id-1');
   });
 });

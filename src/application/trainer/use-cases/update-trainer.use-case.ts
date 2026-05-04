@@ -3,7 +3,7 @@ import {
   TrainerRepositoryPort,
   UpdateTrainerData,
 } from '../../../domain/trainer/trainer.repository.port';
-import { ResourceNotFoundException } from '../../../domain/exceptions/external-service.exception';
+import { ResourceNotFoundException } from '../../../domain/exceptions/resource-not-found.exception';
 import { EmailConflictException } from '../../../domain/exceptions/email-conflict.exception';
 
 export class UpdateTrainerUseCase {

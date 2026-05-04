@@ -1,7 +1,7 @@
 import { Team } from '../../../domain/team/team.entity';
 import { TeamRepositoryPort } from '../../../domain/team/team.repository.port';
 import { TrainerRepositoryPort } from '../../../domain/trainer/trainer.repository.port';
-import { ResourceNotFoundException } from '../../../domain/exceptions/external-service.exception';
+import { ResourceNotFoundException } from '../../../domain/exceptions/resource-not-found.exception';
 
 export class CreateTeamUseCase {
   constructor(

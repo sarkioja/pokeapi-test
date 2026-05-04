@@ -1,6 +1,6 @@
 import { Team } from '../../../domain/team/team.entity';
 import { TeamRepositoryPort, UpdateTeamData } from '../../../domain/team/team.repository.port';
-import { ResourceNotFoundException } from '../../../domain/exceptions/external-service.exception';
+import { ResourceNotFoundException } from '../../../domain/exceptions/resource-not-found.exception';
 
 export class UpdateTeamUseCase {
   constructor(private readonly teamRepository: TeamRepositoryPort) {}

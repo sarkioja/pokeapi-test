@@ -16,8 +16,8 @@ import { EmailConflictException } from '../../domain/exceptions/email-conflict.e
 import {
   ExternalServiceException,
   CepNotFoundExternalException,
-  ResourceNotFoundException,
 } from '../../domain/exceptions/external-service.exception';
+import { ResourceNotFoundException } from '../../domain/exceptions/resource-not-found.exception';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {

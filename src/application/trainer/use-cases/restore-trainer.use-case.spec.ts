@@ -1,7 +1,7 @@
 import { RestoreTrainerUseCase } from './restore-trainer.use-case';
 import { TrainerRepositoryPort } from '../../../domain/trainer/trainer.repository.port';
 import { Trainer } from '../../../domain/trainer/trainer.entity';
-import { ResourceNotFoundException } from '../../../domain/exceptions/external-service.exception';
+import { ResourceNotFoundException } from '../../../domain/exceptions/resource-not-found.exception';
 import { EmailConflictException } from '../../../domain/exceptions/email-conflict.exception';
 
 const makeTrainer = (): Trainer =>

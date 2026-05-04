@@ -1,26 +1,12 @@
 import { Module } from '@nestjs/common';
-import {
-  LOGGER_PORT,
-  POKEAPI_PORT,
-  POKEMON_CACHE_CONFIG,
-  POKEMON_REPOSITORY,
-  TEAM_REPOSITORY,
-  TRAINER_REPOSITORY,
-} from '../../application/di/tokens';
-import { PokeApiPort } from '../../domain/ports/pokeapi.port';
-import { PokemonRepositoryPort } from '../../domain/pokemon/pokemon.repository.port';
+import { TEAM_REPOSITORY, TRAINER_REPOSITORY } from '../../domain/di/tokens';
 import { TeamRepositoryPort } from '../../domain/team/team.repository.port';
 import { TrainerRepositoryPort } from '../../domain/trainer/trainer.repository.port';
 import { TeamPersistenceModule } from '../database/typeorm/team-persistence.module';
 import { TrainerPersistenceModule } from '../database/typeorm/trainer-persistence.module';
-import { PokemonPersistenceModule } from '../database/typeorm/pokemon-persistence.module';
-import { PokeApiModule } from '../http-clients/pokeapi/pokeapi.module';
-import { ApplicationConfigModule } from '../config/application-config.module';
-import { LoggingModule } from '../logging/logging.module';
-import { LoggerPort } from '../../application/ports/logger.port';
-import { PokemonCacheConfigPort } from '../../application/ports/pokemon-cache-config.port';
 import { PokemonApplicationModule } from './pokemon-application.module';
 import { GetOrFetchPokemonUseCase } from '../../application/pokemon/use-cases/get-or-fetch-pokemon.use-case';
+import { GetOrFetchTypeUseCase } from '../../application/pokemon/use-cases/get-or-fetch-type.use-case';
 import { AddPokemonToTeamUseCase } from '../../application/team/use-cases/add-pokemon-to-team.use-case';
 import { AnalyzeTeamTypesUseCase } from '../../application/team/use-cases/analyze-team-types.use-case';
 import { CreateTeamUseCase } from '../../application/team/use-cases/create-team.use-case';
@@ -30,15 +16,7 @@ import { RemovePokemonFromTeamUseCase } from '../../application/team/use-cases/r
 import { UpdateTeamUseCase } from '../../application/team/use-cases/update-team.use-case';
 
 @Module({
-  imports: [
-    TeamPersistenceModule,
-    TrainerPersistenceModule,
-    PokemonPersistenceModule,
-    PokeApiModule,
-    PokemonApplicationModule,
-    ApplicationConfigModule,
-    LoggingModule,
-  ],
+  imports: [TeamPersistenceModule, TrainerPersistenceModule, PokemonApplicationModule],
   providers: [
     {
       provide: CreateTeamUseCase,
@@ -78,20 +56,9 @@ import { UpdateTeamUseCase } from '../../application/team/use-cases/update-team.
     },
     {
       provide: AnalyzeTeamTypesUseCase,
-      inject: [
-        TEAM_REPOSITORY,
-        POKEMON_REPOSITORY,
-        POKEAPI_PORT,
-        POKEMON_CACHE_CONFIG,
-        LOGGER_PORT,
-      ],
-      useFactory: (
-        teamRepository: TeamRepositoryPort,
-        pokemonRepository: PokemonRepositoryPort,
-        pokeApi: PokeApiPort,
-        config: PokemonCacheConfigPort,
-        logger: LoggerPort,
-      ) => new AnalyzeTeamTypesUseCase(teamRepository, pokemonRepository, pokeApi, config, logger),
+      inject: [TEAM_REPOSITORY, GetOrFetchTypeUseCase],
+      useFactory: (teamRepository: TeamRepositoryPort, getOrFetchType: GetOrFetchTypeUseCase) =>
+        new AnalyzeTeamTypesUseCase(teamRepository, getOrFetchType),
     },
   ],
   exports: [

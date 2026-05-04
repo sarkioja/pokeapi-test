@@ -5,7 +5,7 @@ import { DataSource } from 'typeorm';
 import { AppModule } from '../../src/app.module';
 import { ValidationPipe } from '../../src/shared/pipes/validation.pipe';
 import { GlobalExceptionFilter } from '../../src/shared/filters/global-exception.filter';
-import { POKEAPI_PORT } from '../../src/application/di/tokens';
+import { POKEAPI_PORT } from '../../src/domain/di/tokens';
 import { PokeApiPort } from '../../src/domain/ports/pokeapi.port';
 
 const API_KEY = 'e2e-test-key';

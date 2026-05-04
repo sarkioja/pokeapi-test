@@ -1,25 +1,17 @@
 import { Pokemon } from '../../../domain/pokemon/pokemon.entity';
 import { PokemonRepositoryPort } from '../../../domain/pokemon/pokemon.repository.port';
 import { PokeApiPort } from '../../../domain/ports/pokeapi.port';
-import {
-  ResourceNotFoundException,
-  ExternalServiceException,
-} from '../../../domain/exceptions/external-service.exception';
-import { PokemonCacheConfigPort } from '../../ports/pokemon-cache-config.port';
+import { ResourceNotFoundException } from '../../../domain/exceptions/resource-not-found.exception';
+import { ExternalServiceException } from '../../../domain/exceptions/external-service.exception';
 import { LoggerPort } from '../../ports/logger.port';
 
 export class GetOrFetchPokemonUseCase {
-  private readonly ttlMs: number;
-
   constructor(
     private readonly pokemonRepository: PokemonRepositoryPort,
     private readonly pokeApi: PokeApiPort,
-    config: PokemonCacheConfigPort,
+    private readonly ttlMs: number,
     private readonly logger: LoggerPort,
-  ) {
-    const ttlHours = config.getPokemonTtlHours();
-    this.ttlMs = ttlHours * 60 * 60 * 1000;
-  }
+  ) {}
 
   async executeByName(name: string): Promise<Pokemon> {
     const existing = await this.pokemonRepository.findByName(name.toLowerCase());

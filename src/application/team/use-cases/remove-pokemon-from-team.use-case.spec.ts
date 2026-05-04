@@ -2,7 +2,7 @@ import { RemovePokemonFromTeamUseCase } from './remove-pokemon-from-team.use-cas
 import { TeamRepositoryPort } from '../../../domain/team/team.repository.port';
 import { Team } from '../../../domain/team/team.entity';
 import { TeamPokemon } from '../../../domain/team-pokemon/team-pokemon.entity';
-import { ResourceNotFoundException } from '../../../domain/exceptions/external-service.exception';
+import { ResourceNotFoundException } from '../../../domain/exceptions/resource-not-found.exception';
 
 const makeSlot = (id = 'slot-1'): TeamPokemon =>
   new TeamPokemon(id, 'team-1', 'p-1', 1, null, new Date());

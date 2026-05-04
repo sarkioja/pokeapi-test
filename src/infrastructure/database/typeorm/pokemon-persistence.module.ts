@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { POKEMON_REPOSITORY } from '../../../application/di/tokens';
+import { POKEMON_REPOSITORY } from '../../../domain/di/tokens';
 import { PokemonOrmEntity } from './entities/pokemon.orm-entity';
 import { PokemonTypeOrmEntity } from './entities/pokemon-type.orm-entity';
 import { PokemonTypeOrmRepository } from './repositories/pokemon.typeorm-repository';

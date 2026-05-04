@@ -1,7 +1,7 @@
 import { UpdateTeamUseCase } from './update-team.use-case';
 import { TeamRepositoryPort } from '../../../domain/team/team.repository.port';
 import { Team } from '../../../domain/team/team.entity';
-import { ResourceNotFoundException } from '../../../domain/exceptions/external-service.exception';
+import { ResourceNotFoundException } from '../../../domain/exceptions/resource-not-found.exception';
 
 const makeTeam = (name = 'Dream Team'): Team =>
   new Team('team-1', name, 'active', 'trainer-1', [], new Date(), new Date());
