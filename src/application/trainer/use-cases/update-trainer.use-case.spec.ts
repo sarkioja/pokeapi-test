@@ -56,9 +56,9 @@ describe('UpdateTrainerUseCase', () => {
     repo.findById.mockResolvedValue(makeTrainer());
     repo.existsActiveByEmail.mockResolvedValue(true);
 
-    await expect(
-      useCase.execute('id-1', { email: 'taken@pokemon.com' }),
-    ).rejects.toBeInstanceOf(EmailConflictException);
+    await expect(useCase.execute('id-1', { email: 'taken@pokemon.com' })).rejects.toBeInstanceOf(
+      EmailConflictException,
+    );
     expect(repo.update).not.toHaveBeenCalled();
   });
 
