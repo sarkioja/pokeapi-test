@@ -2,6 +2,8 @@ import { TeamPokemon } from '../team-pokemon/team-pokemon.entity';
 
 export type TeamStatus = 'active' | 'archived';
 
+export const MAX_TEAM_SIZE = 5;
+
 export class Team {
   constructor(
     public readonly id: string,
@@ -18,7 +20,7 @@ export class Team {
   }
 
   isFull(): boolean {
-    return this.pokemon.length >= 5;
+    return this.pokemon.length >= MAX_TEAM_SIZE;
   }
 
   hasPokemon(pokemonId: string): boolean {
