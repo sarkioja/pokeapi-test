@@ -2,7 +2,7 @@
 
 ## Time × Pokémon
 
-- **Máximo 5 pokémon por time** — validado por `COUNT(*) < 5`; slots com buracos permitidos → 422 `TEAM_FULL`
+- **Máximo 5 pokémon por time** — limite definido pela constante `MAX_TEAM_SIZE = 5` em `src/domain/team/team.entity.ts`; validado pelo método `Team.isFull()` antes de qualquer persistência; slots com buracos permitidos → 422 `TEAM_FULL`
 - **Sem duplicatas no time** — verificação por `pokemonId` + `UNIQUE(team_id, pokemon_id)` no banco → 409 `DUPLICATE_POKEMON`
 - **Unicidade de slot** — `UNIQUE(team_id, slot)` no banco garante que dois pokémon não ocupem o mesmo slot; o use case seleciona o próximo slot livre automaticamente
 - **Time arquivado não aceita pokémon** → 422 `TEAM_ARCHIVED`

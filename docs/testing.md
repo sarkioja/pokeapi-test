@@ -29,10 +29,10 @@ Cada suite limpa suas tabelas no `beforeEach` via `DELETE FROM` (dentro do schem
 
 | Suite | Testes |
 |-------|--------|
-| Unit | 31 |
+| Unit | 51 |
 | Integration | 13 |
 | E2E | 33 |
-| **Total** | **77** |
+| **Total** | **97** |
 
 ---
 
@@ -45,6 +45,21 @@ Cada suite limpa suas tabelas no `beforeEach` via `DELETE FROM` (dentro do schem
 ---
 
 ## Testes unitários
+
+### `GetTrainerUseCase`
+| Teste | O que valida |
+|-------|-------------|
+| returns trainer when found | Retorna o treinador quando encontrado pelo UUID |
+| throws ResourceNotFoundException when not found | Lança 404 para UUID inexistente |
+| returns paginated trainers | `findAll` repassa `limit` e `offset` e retorna `{ data, total }` |
+
+### `UpdateTrainerUseCase`
+| Teste | O que valida |
+|-------|-------------|
+| throws ResourceNotFoundException when trainer does not exist | Rejeita atualização de treinador inexistente sem chamar o repositório |
+| throws EmailConflictException when new email is already taken | Rejeita troca de e-mail quando já está em uso por outro treinador ativo |
+| skips email check when email is not being updated | Não chama `existsActiveByEmail` quando o campo `email` não está no payload |
+| updates and returns trainer when new email is available | Verifica disponibilidade e persiste quando o e-mail está livre |
 
 ### `CreateTrainerUseCase`
 | Teste | O que valida |
@@ -73,6 +88,39 @@ Cada suite limpa suas tabelas no `beforeEach` via `DELETE FROM` (dentro do schem
 | throws ResourceNotFoundException when trainer does not exist | Rejeita restore de treinador não encontrado |
 | throws EmailConflictException when email is taken by another active trainer | Rejeita restore quando outro treinador ativo já usa o e-mail |
 | restores trainer and associated teams | Restaura o treinador e os times deletados na mesma transação |
+
+### `CreateTeamUseCase`
+| Teste | O que valida |
+|-------|-------------|
+| throws ResourceNotFoundException when trainer does not exist | Rejeita criação de time para treinador inexistente |
+| creates and returns team when trainer exists | Cria o time com nome e `trainerId` corretos quando o treinador existe |
+
+### `GetTeamUseCase`
+| Teste | O que valida |
+|-------|-------------|
+| returns team when found | Retorna o time com o roster de pokémon quando encontrado |
+| throws ResourceNotFoundException when team not found | Lança 404 para UUID de time inexistente |
+| throws ResourceNotFoundException when trainer does not exist | Rejeita listagem por treinador inexistente sem consultar times |
+| returns paginated teams when trainer exists | Repassa `limit` e `offset` e retorna `{ data, total }` dos times do treinador |
+
+### `UpdateTeamUseCase`
+| Teste | O que valida |
+|-------|-------------|
+| throws ResourceNotFoundException when team does not exist | Rejeita atualização de time inexistente |
+| updates and returns team | Persiste e retorna o time com os dados atualizados |
+
+### `DeleteTeamUseCase`
+| Teste | O que valida |
+|-------|-------------|
+| throws ResourceNotFoundException when team does not exist | Rejeita deleção de time inexistente sem chamar o repositório |
+| soft deletes team when found | Chama `softDelete` com o ID correto quando o time existe |
+
+### `RemovePokemonFromTeamUseCase`
+| Teste | O que valida |
+|-------|-------------|
+| throws ResourceNotFoundException when team does not exist | Rejeita remoção quando o time não existe |
+| throws ResourceNotFoundException when slot is not in team | Rejeita remoção quando o slot UUID não pertence ao time |
+| removes pokemon slot from team | Chama `removePokemon` com `teamId` e `slotId` corretos |
 
 ### `AddPokemonToTeamUseCase`
 | Teste | O que valida |

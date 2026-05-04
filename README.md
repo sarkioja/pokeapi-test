@@ -161,6 +161,6 @@ API Key, rate limiting, helmet, CORS e Swagger UI:
 ## Acesso à API de teste
 
 - **Swagger UI**: https://pokeapi-test-dev.onrender.com/api
-- **Chave de API**: utilize a `API_KEY` fornecida
+- **Chave de API**: utilize a `API_KEY` `139191c29c26cbe7babf3d27b96a4734f8ae89da3de79b7f67017617556771cf` - Válida pelas próximas 24 horas
 - **Bruno collection**: pasta `.bruno/` — importe no [Bruno](https://www.usebruno.com/); a chave de acesso local está no `.env` gerado a partir do `.env.example`
 - **Local**: `http://localhost:3000/api`
