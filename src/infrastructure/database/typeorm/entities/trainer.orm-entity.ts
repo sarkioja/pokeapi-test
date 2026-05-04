@@ -12,44 +12,44 @@ import { TeamOrmEntity } from './team.orm-entity';
 @Entity('trainers')
 export class TrainerOrmEntity {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  declare id: string;
 
   @Column({ type: 'varchar', length: 255 })
-  name: string;
+  declare name: string;
 
   @Column({ type: 'varchar', length: 255 })
-  email: string;
+  declare email: string;
 
   @Column({ type: 'varchar', length: 8, nullable: true })
-  cep: string | null;
+  declare cep: string | null;
 
   @Column({ name: 'address_street', type: 'varchar', length: 255, nullable: true })
-  addressStreet: string | null;
+  declare addressStreet: string | null;
 
   @Column({ name: 'address_neighborhood', type: 'varchar', length: 255, nullable: true })
-  addressNeighborhood: string | null;
+  declare addressNeighborhood: string | null;
 
   @Column({ name: 'address_city', type: 'varchar', length: 255, nullable: true })
-  addressCity: string | null;
+  declare addressCity: string | null;
 
   @Column({ name: 'address_state', type: 'varchar', length: 2, nullable: true })
-  addressState: string | null;
+  declare addressState: string | null;
 
   @Column({ name: 'address_country', type: 'varchar', length: 255, nullable: true })
-  addressCountry: string | null;
+  declare addressCountry: string | null;
 
   @Column({ name: 'favorite_pokeapi_id', type: 'integer', nullable: true })
-  favoritePokeapiId: number | null;
+  declare favoritePokeapiId: number | null;
 
   @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
+  declare createdAt: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt: Date;
+  declare updatedAt: Date;
 
   @DeleteDateColumn({ name: 'deleted_at' })
-  deletedAt: Date | null;
+  declare deletedAt: Date | null;
 
   @OneToMany(() => TeamOrmEntity, (team) => team.trainer)
-  teams: TeamOrmEntity[];
+  declare teams: TeamOrmEntity[];
 }

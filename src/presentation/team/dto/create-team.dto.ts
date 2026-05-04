@@ -4,9 +4,9 @@ import { IsString, IsUUID } from 'class-validator';
 export class CreateTeamDto {
   @ApiProperty()
   @IsString()
-  name: string;
+  declare name: string;
 
   @ApiProperty()
   @IsUUID()
-  trainerId: string;
+  declare trainerId: string;
 }

@@ -37,7 +37,10 @@ describe('ListPokemonUseCase', () => {
   });
 
   it('returns the page from the repository', async () => {
-    const pokemon = [makePokemon({ id: 'id-1', name: 'pikachu' }), makePokemon({ id: 'id-2', pokeapiId: 6, name: 'charizard' })];
+    const pokemon = [
+      makePokemon({ id: 'id-1', name: 'pikachu' }),
+      makePokemon({ id: 'id-2', pokeapiId: 6, name: 'charizard' }),
+    ];
     repo.findAll.mockResolvedValue({ data: pokemon, total: 2 });
 
     const result = await useCase.execute(10, 0);

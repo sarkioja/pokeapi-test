@@ -6,7 +6,9 @@ const config: Config = {
   globalSetup: '<rootDir>/test/global-setup.ts',
   setupFiles: ['<rootDir>/test/setup-test-env.ts'],
   testRegex: '.*\\.int-spec\\.ts$',
-  transform: { '^.+\\.(t|j)s$': 'ts-jest' },
+  transform: {
+    '^.+\\.(t|j)s$': ['ts-jest', { tsconfig: '<rootDir>/test/tsconfig.json' }],
+  },
   testEnvironment: 'node',
   testTimeout: 30000,
   moduleNameMapper: {
