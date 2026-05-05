@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { LOGGER_PORT } from '../../application/di/tokens';
+import { LOGGER_PORT } from '../di/tokens';
 import { NestLoggerAdapter } from './nest-logger.adapter';
 
 @Module({

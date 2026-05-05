@@ -3,8 +3,8 @@ import type { Config } from 'jest';
 const config: Config = {
   moduleFileExtensions: ['js', 'json', 'ts'],
   rootDir: '.',
-  globalSetup: '<rootDir>/test/global-setup.ts',
-  setupFiles: ['<rootDir>/test/setup-test-env.ts'],
+  globalSetup: '<rootDir>/test/global-setup.integration.ts',
+  setupFiles: ['<rootDir>/test/setup-test-env.integration.ts'],
   testRegex: '.*\\.int-spec\\.ts$',
   transform: {
     '^.+\\.(t|j)s$': ['ts-jest', { tsconfig: '<rootDir>/test/tsconfig.json' }],

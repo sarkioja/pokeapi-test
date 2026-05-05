@@ -1,7 +1,7 @@
 import { TeamRepositoryPort } from '../../../domain/team/team.repository.port';
 import { DamageRelations } from '../../../domain/pokemon/pokemon-type.entity';
 import { ResourceNotFoundException } from '../../../domain/exceptions/resource-not-found.exception';
-import { TypeFetcher } from '../../pokemon/use-cases/get-or-fetch-type.use-case';
+import { TypeFetcher } from '../../ports/type-fetcher.port';
 
 export interface TypeAnalysis {
   weaknesses: string[];

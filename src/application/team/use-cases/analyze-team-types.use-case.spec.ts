@@ -5,7 +5,7 @@ import { TeamPokemon } from '../../../domain/team-pokemon/team-pokemon.entity';
 import { Pokemon } from '../../../domain/pokemon/pokemon.entity';
 import { DamageRelations } from '../../../domain/pokemon/pokemon-type.entity';
 import { ResourceNotFoundException } from '../../../domain/exceptions/resource-not-found.exception';
-import { TypeFetcher } from '../../pokemon/use-cases/get-or-fetch-type.use-case';
+import { TypeFetcher } from '../../ports/type-fetcher.port';
 
 const ELECTRIC_RELATIONS: DamageRelations = {
   doubleDamageTo: ['water', 'flying'],

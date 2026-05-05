@@ -6,10 +6,10 @@
 # Unitários (sem banco)
 npm run test:unit
 
-# Integração (banco real — schema 'test' isolado)
+# Integração (banco real — schema 'test_integration' isolado)
 npm run test:integration
 
-# E2E (AppModule completo — schema 'test' isolado)
+# E2E (AppModule completo — schema 'test_e2e' isolado)
 npm run test:e2e
 ```
 
@@ -17,11 +17,11 @@ npm run test:e2e
 
 ## Isolamento de dados
 
-Os testes de integração e E2E usam o schema PostgreSQL `test` dentro do banco `pokeapi_dev`.
+Os testes de integração e E2E usam schemas PostgreSQL separados dentro do banco `pokeapi_dev`: `test_integration` para integração e `test_e2e` para E2E.
 
-O `globalSetup` recria o schema e aplica migrations antes de cada run — **dados em `public.*` nunca são afetados**.
+O `globalSetup` de cada configuração recria seu schema e aplica migrations antes de cada run — **dados em `public.*` nunca são afetados**.
 
-Cada suite limpa suas tabelas no `beforeEach` via `DELETE FROM` (dentro do schema `test`).
+Cada suite limpa suas tabelas no `beforeEach` via `DELETE FROM` (dentro do schema configurado). Como integração e E2E usam schemas diferentes, os dois comandos podem rodar em paralelo sem disputar o mesmo schema.
 
 ---
 

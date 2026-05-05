@@ -39,17 +39,16 @@ src/
 │   ├── ports/
 │   │   ├── pokeapi.port.ts              # Interface para PokéAPI
 │   │   └── viacep.port.ts               # Interface para ViaCEP
-│   ├── di/tokens.ts                     # Tokens de ports de domínio (repositórios e ports externos)
 │   └── exceptions/                      # Hierarquia de erros pura
 │
 ├── application/                   # Use cases — orquestram domínio e ports
-│   ├── di/tokens.ts                # Tokens de ports de aplicação (LoggerPort, PokemonCacheConfig)
 │   ├── ports/                      # Ports transversais de aplicação
 │   ├── trainer/use-cases/
 │   ├── team/use-cases/
 │   └── pokemon/use-cases/
 │
 ├── infrastructure/                # Adapters — implementam os ports do domínio
+│   ├── di/tokens.ts                # Tokens de composição dos adapters e ports
 │   ├── database/
 │   │   ├── typeorm/
 │   │   │   ├── entities/            # ORM entities (@Entity, @Column)
@@ -216,7 +215,7 @@ flowchart TD
 | `joi` | — | Validação do schema de variáveis de ambiente na inicialização. A aplicação não sobe se `API_KEYS` estiver vazio ou mal formado. |
 | `jest` + `ts-jest` | — | Três configs separadas: unit (`jest.config.ts`), integration (`jest.integration.config.ts`), E2E (`jest.e2e.config.ts`). |
 | `supertest` | — | Requisições HTTP nos testes E2E contra o `AppModule` completo. |
-| `pg` | — | Driver PostgreSQL direto, usado no `globalSetup` de testes para criar e dropar o schema `test`. |
+| `pg` | — | Driver PostgreSQL direto, usado no `globalSetup` de testes para criar e dropar os schemas isolados de integração e E2E. |
 
 ### Decisões de estrutura notáveis
 

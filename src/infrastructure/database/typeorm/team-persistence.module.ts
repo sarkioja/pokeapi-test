@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { TEAM_REPOSITORY } from '../../../domain/di/tokens';
+import { TEAM_REPOSITORY } from '../../di/tokens';
 import { TeamOrmEntity } from './entities/team.orm-entity';
 import { TeamTypeOrmRepository } from './repositories/team.typeorm-repository';
 

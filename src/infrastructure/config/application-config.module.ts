@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { POKEMON_CACHE_CONFIG } from '../../application/di/tokens';
+import { POKEMON_CACHE_CONFIG } from '../di/tokens';
 import { NestPokemonCacheConfigAdapter } from './nest-pokemon-cache-config.adapter';
 
 @Module({

@@ -39,26 +39,30 @@ src/
 │   ├── ports/
 │   │   ├── pokeapi.port.ts              # Interface for PokéAPI
 │   │   └── viacep.port.ts               # Interface for ViaCEP
-│   ├── di/tokens.ts                     # Tokens for domain ports (repositories and external ports)
 │   └── exceptions/                      # Pure error hierarchy
 │
 ├── application/                   # Use cases — orchestrate domain and ports
-│   ├── di/tokens.ts                # Tokens for application-layer ports (LoggerPort, PokemonCacheConfig)
+│   ├── ports/                      # Cross-cutting application ports
 │   ├── trainer/use-cases/
 │   ├── team/use-cases/
 │   └── pokemon/use-cases/
 │
 ├── infrastructure/                # Adapters — implement domain ports
+│   ├── di/tokens.ts                # Adapter and port composition tokens
 │   ├── database/
 │   │   ├── typeorm/
 │   │   │   ├── entities/            # ORM entities (@Entity, @Column)
 │   │   │   ├── repositories/        # Implement RepositoryPort
 │   │   │   ├── mappers/             # OrmEntity ↔ DomainEntity
+│   │   │   ├── *-persistence.module.ts # Nest bindings for TypeORM adapters
 │   │   │   └── migrations/          # TypeORM migrations (synchronize: false)
 │   │   └── data-source.ts           # DataSource for migrations CLI
-│   └── http-clients/
+│   ├── config/                      # Configuration adapters
+│   ├── http-clients/
 │       ├── pokeapi/                 # Implements PokeApiPort
 │       └── viacep/                  # Implements ViaCepPort
+│   ├── logging/                     # Logging adapter
+│   └── modules/                     # Nest composition of use cases via factories
 │
 ├── presentation/                  # Controllers, DTOs, Guards, Filters
 │   ├── trainer/
@@ -211,7 +215,7 @@ flowchart TD
 | `joi` | — | Environment variable schema validation at startup. The application won't start if `API_KEYS` is empty or malformed. |
 | `jest` + `ts-jest` | — | Three separate configs: unit (`jest.config.ts`), integration (`jest.integration.config.ts`), E2E (`jest.e2e.config.ts`). |
 | `supertest` | — | HTTP requests in E2E tests against the full `AppModule`. |
-| `pg` | — | Direct PostgreSQL driver, used in test `globalSetup` to create and drop the `test` schema. |
+| `pg` | — | Direct PostgreSQL driver, used in test `globalSetup` to create and drop isolated integration and E2E schemas. |
 
 ### Notable structural decisions
 

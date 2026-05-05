@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { TEAM_REPOSITORY, TRAINER_REPOSITORY } from '../../domain/di/tokens';
+import { TEAM_REPOSITORY, TRAINER_REPOSITORY } from '../di/tokens';
 import { TeamRepositoryPort } from '../../domain/team/team.repository.port';
 import { TrainerRepositoryPort } from '../../domain/trainer/trainer.repository.port';
 import { TeamPersistenceModule } from '../database/typeorm/team-persistence.module';

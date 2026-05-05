@@ -2,10 +2,7 @@ import { PokemonRepositoryPort } from '../../../domain/pokemon/pokemon.repositor
 import { PokeApiPort } from '../../../domain/ports/pokeapi.port';
 import { DamageRelations } from '../../../domain/pokemon/pokemon-type.entity';
 import { LoggerPort } from '../../ports/logger.port';
-
-export interface TypeFetcher {
-  execute(typeName: string): Promise<DamageRelations | null>;
-}
+import { TypeFetcher } from '../../ports/type-fetcher.port';
 
 export class GetOrFetchTypeUseCase implements TypeFetcher {
   constructor(

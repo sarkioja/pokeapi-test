@@ -6,10 +6,10 @@
 # Unit tests (no database)
 npm run test:unit
 
-# Integration tests (real database — isolated 'test' schema)
+# Integration tests (real database — isolated 'test_integration' schema)
 npm run test:integration
 
-# E2E tests (full AppModule — isolated 'test' schema)
+# E2E tests (full AppModule — isolated 'test_e2e' schema)
 npm run test:e2e
 ```
 
@@ -17,11 +17,11 @@ npm run test:e2e
 
 ## Data Isolation
 
-Integration and E2E tests use the `test` PostgreSQL schema inside the `pokeapi_dev` database.
+Integration and E2E tests use separate PostgreSQL schemas inside the `pokeapi_dev` database: `test_integration` for integration and `test_e2e` for E2E.
 
-The `globalSetup` recreates the schema and applies migrations before each run — **data in `public.*` is never affected**.
+Each config's `globalSetup` recreates its own schema and applies migrations before each run — **data in `public.*` is never affected**.
 
-Each suite clears its tables in `beforeEach` via `DELETE FROM` (within the `test` schema).
+Each suite clears its tables in `beforeEach` via `DELETE FROM` (within the configured schema). Because integration and E2E use different schemas, both commands can run in parallel without competing for the same schema.
 
 ---
 

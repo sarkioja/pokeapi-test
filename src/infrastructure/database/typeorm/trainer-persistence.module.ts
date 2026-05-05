@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { TRAINER_REPOSITORY } from '../../../domain/di/tokens';
+import { TRAINER_REPOSITORY } from '../../di/tokens';
 import { TrainerOrmEntity } from './entities/trainer.orm-entity';
 import { TrainerTypeOrmRepository } from './repositories/trainer.typeorm-repository';
 

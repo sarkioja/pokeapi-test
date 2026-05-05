@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
-import { POKEAPI_PORT, POKEMON_REPOSITORY } from '../../domain/di/tokens';
-import { LOGGER_PORT, POKEMON_CACHE_CONFIG } from '../../application/di/tokens';
+import { LOGGER_PORT, POKEAPI_PORT, POKEMON_CACHE_CONFIG, POKEMON_REPOSITORY } from '../di/tokens';
 import { PokeApiPort } from '../../domain/ports/pokeapi.port';
 import { PokemonRepositoryPort } from '../../domain/pokemon/pokemon.repository.port';
 import { PokemonPersistenceModule } from '../database/typeorm/pokemon-persistence.module';
