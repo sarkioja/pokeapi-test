@@ -136,7 +136,7 @@ Conventional Commits, Trunk-Based Development adaptado e hooks Husky (pre-commit
 
 ## Testes
 
-Comandos, isolamento via schema PostgreSQL `test`, cobertura atual (74 testes):
+Comandos, isolamento via schemas PostgreSQL dedicados, cobertura atual (106 testes):
 
 → [docs/testing.md](docs/testing.md)
 

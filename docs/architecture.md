@@ -42,21 +42,27 @@ src/
 │   └── exceptions/                      # Hierarquia de erros pura
 │
 ├── application/                   # Use cases — orquestram domínio e ports
+│   ├── ports/                      # Ports transversais de aplicação
 │   ├── trainer/use-cases/
 │   ├── team/use-cases/
 │   └── pokemon/use-cases/
 │
 ├── infrastructure/                # Adapters — implementam os ports do domínio
+│   ├── di/tokens.ts                # Tokens de composição dos adapters e ports
 │   ├── database/
 │   │   ├── typeorm/
 │   │   │   ├── entities/            # ORM entities (@Entity, @Column)
 │   │   │   ├── repositories/        # Implementam RepositoryPort
 │   │   │   ├── mappers/             # OrmEntity ↔ DomainEntity
+│   │   │   ├── *-persistence.module.ts # Bindings Nest dos adapters TypeORM
 │   │   │   └── migrations/          # Migrations TypeORM (synchronize: false)
 │   │   └── data-source.ts           # DataSource para CLI de migrations
-│   └── http-clients/
+│   ├── config/                      # Adapters de configuração
+│   ├── http-clients/
 │       ├── pokeapi/                 # Implementa PokeApiPort
 │       └── viacep/                  # Implementa ViaCepPort
+│   ├── logging/                     # Adapter de logging
+│   └── modules/                     # Composição Nest dos use cases via factories
 │
 ├── presentation/                  # Controllers, DTOs, Guards, Filters
 │   ├── trainer/
@@ -115,6 +121,7 @@ flowchart TD
         ATA[AnalyzeTeamTypesUseCase]
 
         GOP[GetOrFetchPokemonUseCase]
+        GOT[GetOrFetchTypeUseCase]
         LP[ListPokemonUseCase]
     end
 
@@ -152,7 +159,9 @@ flowchart TD
     CTE & GetTE & UTE & DTE & ATA --> TMP
     APT & RPT --> TMP
     APT & GOP & LP --> PP
-    ATA --> PAP
+    ATA --> GOT
+    GOT --> PAP
+    GOT --> PP
 
     TRP -.-> TORM
     TMP -.-> TEORM
@@ -206,7 +215,7 @@ flowchart TD
 | `joi` | — | Validação do schema de variáveis de ambiente na inicialização. A aplicação não sobe se `API_KEYS` estiver vazio ou mal formado. |
 | `jest` + `ts-jest` | — | Três configs separadas: unit (`jest.config.ts`), integration (`jest.integration.config.ts`), E2E (`jest.e2e.config.ts`). |
 | `supertest` | — | Requisições HTTP nos testes E2E contra o `AppModule` completo. |
-| `pg` | — | Driver PostgreSQL direto, usado no `globalSetup` de testes para criar e dropar o schema `test`. |
+| `pg` | — | Driver PostgreSQL direto, usado no `globalSetup` de testes para criar e dropar os schemas isolados de integração e E2E. |
 
 ### Decisões de estrutura notáveis
 
@@ -218,6 +227,12 @@ A conversão entre `OrmEntity` (objeto do TypeORM, cheio de decorators `@Column`
 
 **`APP_GUARD` global para API Key**
 O `ApiKeyGuard` é registrado como guard global no `AppModule`. Rotas públicas (`/api/health` e o Swagger em `/api`) recebem o decorator `@Public()` para opt-out explícito. A consequência prática: qualquer novo endpoint criado fica protegido por padrão, sem precisar lembrar de adicionar um guard — o esquecimento é seguro.
+
+**Use cases sem decorators de framework**
+Os use cases são classes TypeScript puras: recebem interfaces no construtor e não usam `@Inject`, `ConfigService`, `Logger` ou `DataSource` diretamente. A composição com tokens do Nest acontece nos módulos em `infrastructure/modules/`, usando factories explícitas. Assim, a camada de Application continua testável sem container Nest e sem dependência de infraestrutura.
+
+**Configuração, logging e transações como adapters**
+TTL de cache e logging entram nos use cases por ports (`PokemonCacheConfigPort`, `LoggerPort`), implementados na infraestrutura. Operações transacionais de banco, como soft delete em cascata de treinador e times, ficam nos repositórios TypeORM; o use case apenas aciona a operação de aplicação exposta pelo port.
 
 **Migrations como único mecanismo de schema**
 `synchronize: false` em todos os ambientes, inclusive local. O schema evolui apenas via migrations TypeORM versionadas e commitadas no Git. Isso elimina a classe de bugs onde o banco de desenvolvimento diverge silenciosamente do de produção, e torna o histórico de schema rastreável junto com o código.

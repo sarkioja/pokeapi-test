@@ -17,8 +17,6 @@ export interface PokemonPage {
   total: number;
 }
 
-export const POKEMON_REPOSITORY = 'POKEMON_REPOSITORY';
-
 export interface PokemonRepositoryPort {
   upsertByPokeapiId(data: UpsertPokemonData): Promise<Pokemon>;
   findById(id: string): Promise<Pokemon | null>;

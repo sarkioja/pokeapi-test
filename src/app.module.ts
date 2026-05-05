@@ -9,7 +9,6 @@ import { TrainerModule } from './presentation/trainer/trainer.module';
 import { TeamModule } from './presentation/team/team.module';
 import { PokemonModule } from './presentation/pokemon/pokemon.module';
 import { HealthModule } from './presentation/health/health.module';
-import { ViaCepModule } from './infrastructure/http-clients/viacep/viacep.module';
 
 @Module({
   imports: [
@@ -20,7 +19,6 @@ import { ViaCepModule } from './infrastructure/http-clients/viacep/viacep.module
     }),
     ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
     DatabaseModule,
-    ViaCepModule,
     TrainerModule,
     TeamModule,
     PokemonModule,

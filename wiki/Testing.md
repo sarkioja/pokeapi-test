@@ -6,10 +6,10 @@
 # Unit tests (no database)
 npm run test:unit
 
-# Integration tests (real database — isolated 'test' schema)
+# Integration tests (real database — isolated 'test_integration' schema)
 npm run test:integration
 
-# E2E tests (full AppModule — isolated 'test' schema)
+# E2E tests (full AppModule — isolated 'test_e2e' schema)
 npm run test:e2e
 ```
 
@@ -17,11 +17,11 @@ npm run test:e2e
 
 ## Data Isolation
 
-Integration and E2E tests use the `test` PostgreSQL schema inside the `pokeapi_dev` database.
+Integration and E2E tests use separate PostgreSQL schemas inside the `pokeapi_dev` database: `test_integration` for integration and `test_e2e` for E2E.
 
-The `globalSetup` recreates the schema and applies migrations before each run — **data in `public.*` is never affected**.
+Each config's `globalSetup` recreates its own schema and applies migrations before each run — **data in `public.*` is never affected**.
 
-Each suite clears its tables in `beforeEach` via `DELETE FROM` (within the `test` schema).
+Each suite clears its tables in `beforeEach` via `DELETE FROM` (within the configured schema). Because integration and E2E use different schemas, both commands can run in parallel without competing for the same schema.
 
 ---
 
@@ -29,10 +29,10 @@ Each suite clears its tables in `beforeEach` via `DELETE FROM` (within the `test
 
 | Suite | Tests |
 |-------|-------|
-| Unit | 31 |
+| Unit | 60 |
 | Integration | 13 |
 | E2E | 33 |
-| **Total** | **77** |
+| **Total** | **106** |
 
 ---
 
@@ -51,6 +51,21 @@ Each suite clears its tables in `beforeEach` via `DELETE FROM` (within the `test
 |------|-------------------|
 | creates trainer when email is not taken | Creates and persists the trainer when the email is available |
 | throws EmailConflictException when email is already in use | Rejects creation with a taken email without calling the repository |
+
+### `GetTrainerUseCase`
+| Test | What it validates |
+|------|-------------------|
+| returns trainer when found | Returns the trainer when found by UUID |
+| throws ResourceNotFoundException when not found | Throws 404 for non-existent UUID |
+| returns paginated trainers | `findAll` forwards `limit` and `offset` and returns `{ data, total }` |
+
+### `UpdateTrainerUseCase`
+| Test | What it validates |
+|------|-------------------|
+| throws ResourceNotFoundException when trainer does not exist | Rejects update of non-existent trainer without calling the repository |
+| throws EmailConflictException when new email is already taken | Rejects email change when already used by another active trainer |
+| skips email check when email is not being updated | Does not call `existsActiveByEmail` when `email` is absent from the payload |
+| updates and returns trainer when new email is available | Checks availability and persists when the email is free |
 
 ### `DeleteTrainerUseCase`
 | Test | What it validates |
@@ -74,6 +89,32 @@ Each suite clears its tables in `beforeEach` via `DELETE FROM` (within the `test
 | throws EmailConflictException when email is taken by another active trainer | Rejects restore when another active trainer already uses the email |
 | restores trainer and associated teams | Restores the trainer and teams deleted in the same transaction |
 
+### `CreateTeamUseCase`
+| Test | What it validates |
+|------|-------------------|
+| throws ResourceNotFoundException when trainer does not exist | Rejects team creation for non-existent trainer |
+| creates and returns team when trainer exists | Creates the team with the correct name and `trainerId` when the trainer exists |
+
+### `GetTeamUseCase`
+| Test | What it validates |
+|------|-------------------|
+| returns team when found | Returns the team with its Pokémon roster when found |
+| throws ResourceNotFoundException when team not found | Throws 404 for non-existent team UUID |
+| throws ResourceNotFoundException when trainer does not exist | Rejects listing by non-existent trainer without querying teams |
+| returns paginated teams when trainer exists | Forwards `limit` and `offset` and returns `{ data, total }` for the trainer's teams |
+
+### `UpdateTeamUseCase`
+| Test | What it validates |
+|------|-------------------|
+| throws ResourceNotFoundException when team does not exist | Rejects update of non-existent team |
+| updates and returns team | Persists and returns the team with updated data |
+
+### `DeleteTeamUseCase`
+| Test | What it validates |
+|------|-------------------|
+| throws ResourceNotFoundException when team does not exist | Rejects deletion of non-existent team without calling the repository |
+| soft deletes team when found | Calls `softDelete` with the correct ID when the team exists |
+
 ### `AddPokemonToTeamUseCase`
 | Test | What it validates |
 |------|-------------------|
@@ -83,13 +124,28 @@ Each suite clears its tables in `beforeEach` via `DELETE FROM` (within the `test
 | throws DuplicatePokemonException when pokemon is already in team | Rejects Pokémon already present in the team |
 | adds pokemon to the next available slot and returns updated team | Inserts in the next available slot and returns the updated team |
 
+### `RemovePokemonFromTeamUseCase`
+| Test | What it validates |
+|------|-------------------|
+| throws ResourceNotFoundException when team does not exist | Rejects removal when the team does not exist |
+| throws ResourceNotFoundException when slot is not in team | Rejects removal when the slot UUID does not belong to the team |
+| removes pokemon slot from team | Calls `removePokemon` with the correct `teamId` and `slotId` |
+
 ### `AnalyzeTeamTypesUseCase`
 | Test | What it validates |
 |------|-------------------|
 | throws ResourceNotFoundException when team does not exist | Rejects analysis of non-existent team |
 | returns correct weaknesses, resistances, and immunities for electric type | Correctly calculates weaknesses, resistances, and immunities for electric type |
-| fetches type from PokéAPI when not in local cache | Fetches type effectiveness from PokéAPI when not cached |
-| uses stale cache when PokéAPI is unavailable | Uses stale cache as fallback when PokéAPI is unavailable |
+| skips types for which getOrFetchType returns null | Ignores types for which `GetOrFetchTypeUseCase` returns `null` (PokéAPI unavailable and no cache) |
+
+### `GetOrFetchTypeUseCase`
+| Test | What it validates |
+|------|-------------------|
+| returns cached relations when fresh | Returns local relations without calling PokéAPI when TTL is valid |
+| fetches from PokéAPI when cache is missing | Fetches from PokéAPI and persists locally when no cache exists |
+| fetches from PokéAPI when cache is stale | Re-fetches from PokéAPI when TTL has expired |
+| returns stale cache when PokéAPI is unavailable | Returns expired data with warning when PokéAPI is down |
+| returns null when PokéAPI is unavailable and no cache exists | Returns `null` when PokéAPI fails and there is no local cache |
 
 ### `GetOrFetchPokemonUseCase`
 | Test | What it validates |

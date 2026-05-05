@@ -4,7 +4,7 @@ import { GetOrFetchPokemonUseCase } from '../../pokemon/use-cases/get-or-fetch-p
 import { Team } from '../../../domain/team/team.entity';
 import { Pokemon } from '../../../domain/pokemon/pokemon.entity';
 import { TeamPokemon } from '../../../domain/team-pokemon/team-pokemon.entity';
-import { ResourceNotFoundException } from '../../../domain/exceptions/external-service.exception';
+import { ResourceNotFoundException } from '../../../domain/exceptions/resource-not-found.exception';
 import { TeamArchivedException } from '../../../domain/exceptions/team-archived.exception';
 import { TeamFullException } from '../../../domain/exceptions/team-full.exception';
 import { DuplicatePokemonException } from '../../../domain/exceptions/duplicate-pokemon.exception';

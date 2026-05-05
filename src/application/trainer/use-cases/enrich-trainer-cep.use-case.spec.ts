@@ -2,7 +2,7 @@ import { EnrichTrainerCepUseCase } from './enrich-trainer-cep.use-case';
 import { TrainerRepositoryPort } from '../../../domain/trainer/trainer.repository.port';
 import { ViaCepPort } from '../../../domain/ports/viacep.port';
 import { Trainer } from '../../../domain/trainer/trainer.entity';
-import { ResourceNotFoundException } from '../../../domain/exceptions/external-service.exception';
+import { ResourceNotFoundException } from '../../../domain/exceptions/resource-not-found.exception';
 import { InvalidCepException } from '../../../domain/exceptions/invalid-cep.exception';
 
 const makeTrainer = (): Trainer =>
@@ -30,6 +30,7 @@ const makeRepo = (): jest.Mocked<TrainerRepositoryPort> => ({
   update: jest.fn(),
   updateAddress: jest.fn(),
   softDelete: jest.fn(),
+  softDeleteWithTeams: jest.fn(),
   restore: jest.fn(),
   restoreWithTeams: jest.fn(),
   existsActiveByEmail: jest.fn(),

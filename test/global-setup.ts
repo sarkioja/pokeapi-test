@@ -3,7 +3,11 @@ import { Client } from 'pg';
 import { DataSource } from 'typeorm';
 import { buildBaseDataSourceOptions } from '../src/infrastructure/database/typeorm-base-options';
 
-export default async function globalSetup() {
+export async function setupTestDatabase(schema = process.env.DB_SCHEMA ?? 'test') {
+  if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(schema)) {
+    throw new Error(`Invalid test schema name: ${schema}`);
+  }
+
   const cfg = {
     host: process.env.DB_HOST ?? 'localhost',
     port: Number(process.env.DB_PORT ?? 5432),
@@ -20,17 +24,21 @@ export default async function globalSetup() {
     database: cfg.database,
   });
   await client.connect();
-  await client.query('DROP SCHEMA IF EXISTS test CASCADE');
-  await client.query('CREATE SCHEMA test');
+  await client.query(`DROP SCHEMA IF EXISTS "${schema}" CASCADE`);
+  await client.query(`CREATE SCHEMA "${schema}"`);
   await client.end();
 
   const ds = new DataSource(
     buildBaseDataSourceOptions(
-      { ...cfg, schema: 'test', nodeEnv: 'test', logging: false },
+      { ...cfg, schema, nodeEnv: 'test', logging: false },
       path.join(__dirname, '../src/infrastructure/database'),
     ),
   );
   await ds.initialize();
   await ds.runMigrations();
   await ds.destroy();
+}
+
+export default async function globalSetup() {
+  await setupTestDatabase();
 }

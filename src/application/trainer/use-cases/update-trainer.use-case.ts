@@ -1,18 +1,13 @@
-import { Inject } from '@nestjs/common';
 import { Trainer } from '../../../domain/trainer/trainer.entity';
 import {
-  TRAINER_REPOSITORY,
   TrainerRepositoryPort,
   UpdateTrainerData,
 } from '../../../domain/trainer/trainer.repository.port';
-import { ResourceNotFoundException } from '../../../domain/exceptions/external-service.exception';
+import { ResourceNotFoundException } from '../../../domain/exceptions/resource-not-found.exception';
 import { EmailConflictException } from '../../../domain/exceptions/email-conflict.exception';
 
 export class UpdateTrainerUseCase {
-  constructor(
-    @Inject(TRAINER_REPOSITORY)
-    private readonly trainerRepository: TrainerRepositoryPort,
-  ) {}
+  constructor(private readonly trainerRepository: TrainerRepositoryPort) {}
 
   async execute(id: string, data: UpdateTrainerData): Promise<Trainer> {
     const trainer = await this.trainerRepository.findById(id);

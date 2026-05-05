@@ -10,7 +10,7 @@ import {
   TeamPage,
 } from '../../../../domain/team/team.repository.port';
 import { Team } from '../../../../domain/team/team.entity';
-import { ResourceNotFoundException } from '../../../../domain/exceptions/external-service.exception';
+import { ResourceNotFoundException } from '../../../../domain/exceptions/resource-not-found.exception';
 
 @Injectable()
 export class TeamTypeOrmRepository implements TeamRepositoryPort {

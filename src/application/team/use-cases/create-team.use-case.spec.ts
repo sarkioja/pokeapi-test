@@ -3,7 +3,7 @@ import { TeamRepositoryPort } from '../../../domain/team/team.repository.port';
 import { TrainerRepositoryPort } from '../../../domain/trainer/trainer.repository.port';
 import { Team } from '../../../domain/team/team.entity';
 import { Trainer } from '../../../domain/trainer/trainer.entity';
-import { ResourceNotFoundException } from '../../../domain/exceptions/external-service.exception';
+import { ResourceNotFoundException } from '../../../domain/exceptions/resource-not-found.exception';
 
 const makeTrainer = (): Trainer =>
   new Trainer(
@@ -33,6 +33,7 @@ const makeTrainerRepo = (): jest.Mocked<TrainerRepositoryPort> => ({
   update: jest.fn(),
   updateAddress: jest.fn(),
   softDelete: jest.fn(),
+  softDeleteWithTeams: jest.fn(),
   restore: jest.fn(),
   restoreWithTeams: jest.fn(),
   existsActiveByEmail: jest.fn(),

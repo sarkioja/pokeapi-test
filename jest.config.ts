@@ -18,6 +18,7 @@ const config: Config = {
     '^@shared/(.*)$': '<rootDir>/src/shared/$1',
   },
   testPathIgnorePatterns: ['/node_modules/', '/dist/', '/test/e2e/'],
+  modulePathIgnorePatterns: ['<rootDir>/.claude/'],
 };
 
 export default config;

@@ -1,30 +1,17 @@
-import { Inject, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { Pokemon } from '../../../domain/pokemon/pokemon.entity';
-import {
-  POKEMON_REPOSITORY,
-  PokemonRepositoryPort,
-} from '../../../domain/pokemon/pokemon.repository.port';
-import { POKEAPI_PORT, PokeApiPort } from '../../../domain/ports/pokeapi.port';
-import {
-  ResourceNotFoundException,
-  ExternalServiceException,
-} from '../../../domain/exceptions/external-service.exception';
+import { PokemonRepositoryPort } from '../../../domain/pokemon/pokemon.repository.port';
+import { PokeApiPort } from '../../../domain/ports/pokeapi.port';
+import { ResourceNotFoundException } from '../../../domain/exceptions/resource-not-found.exception';
+import { ExternalServiceException } from '../../../domain/exceptions/external-service.exception';
+import { LoggerPort } from '../../ports/logger.port';
 
 export class GetOrFetchPokemonUseCase {
-  private readonly logger = new Logger(GetOrFetchPokemonUseCase.name);
-  private readonly ttlMs: number;
-
   constructor(
-    @Inject(POKEMON_REPOSITORY)
     private readonly pokemonRepository: PokemonRepositoryPort,
-    @Inject(POKEAPI_PORT)
     private readonly pokeApi: PokeApiPort,
-    private readonly config: ConfigService,
-  ) {
-    const ttlHours = Number(this.config.get<number>('POKEMON_TTL_HOURS', 24));
-    this.ttlMs = ttlHours * 60 * 60 * 1000;
-  }
+    private readonly ttlMs: number,
+    private readonly logger: LoggerPort,
+  ) {}
 
   async executeByName(name: string): Promise<Pokemon> {
     const existing = await this.pokemonRepository.findByName(name.toLowerCase());

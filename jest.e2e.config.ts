@@ -3,8 +3,8 @@ import type { Config } from 'jest';
 const config: Config = {
   moduleFileExtensions: ['js', 'json', 'ts'],
   rootDir: '.',
-  globalSetup: '<rootDir>/test/global-setup.ts',
-  setupFiles: ['<rootDir>/test/setup-test-env.ts'],
+  globalSetup: '<rootDir>/test/global-setup.e2e.ts',
+  setupFiles: ['<rootDir>/test/setup-test-env.e2e.ts'],
   testTimeout: 15000,
   testRegex: './test/e2e/.*\\.e2e-spec\\.ts$',
   transform: {
@@ -18,6 +18,7 @@ const config: Config = {
     '^@presentation/(.*)$': '<rootDir>/src/presentation/$1',
     '^@shared/(.*)$': '<rootDir>/src/shared/$1',
   },
+  modulePathIgnorePatterns: ['<rootDir>/.claude/'],
 };
 
 export default config;

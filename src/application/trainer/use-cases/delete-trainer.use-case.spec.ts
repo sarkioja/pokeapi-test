@@ -1,7 +1,7 @@
 import { DeleteTrainerUseCase } from './delete-trainer.use-case';
 import { TrainerRepositoryPort } from '../../../domain/trainer/trainer.repository.port';
 import { Trainer } from '../../../domain/trainer/trainer.entity';
-import { ResourceNotFoundException } from '../../../domain/exceptions/external-service.exception';
+import { ResourceNotFoundException } from '../../../domain/exceptions/resource-not-found.exception';
 
 const makeTrainer = (): Trainer =>
   new Trainer(
@@ -28,6 +28,7 @@ const makeRepo = (): jest.Mocked<TrainerRepositoryPort> => ({
   update: jest.fn(),
   updateAddress: jest.fn(),
   softDelete: jest.fn(),
+  softDeleteWithTeams: jest.fn(),
   restore: jest.fn(),
   restoreWithTeams: jest.fn(),
   existsActiveByEmail: jest.fn(),
@@ -36,43 +37,24 @@ const makeRepo = (): jest.Mocked<TrainerRepositoryPort> => ({
 describe('DeleteTrainerUseCase', () => {
   let useCase: DeleteTrainerUseCase;
   let repo: jest.Mocked<TrainerRepositoryPort>;
-  let mockManager: { query: jest.Mock };
-  let mockDataSource: { transaction: jest.Mock };
 
   beforeEach(() => {
     repo = makeRepo();
-    mockManager = { query: jest.fn() };
-    mockDataSource = {
-      transaction: jest.fn(async (cb: (manager: typeof mockManager) => Promise<void>) =>
-        cb(mockManager),
-      ),
-    };
-    useCase = new DeleteTrainerUseCase(repo, mockDataSource as any);
+    useCase = new DeleteTrainerUseCase(repo);
   });
 
   it('throws ResourceNotFoundException when trainer does not exist', async () => {
     repo.findById.mockResolvedValue(null);
 
     await expect(useCase.execute('unknown-id')).rejects.toBeInstanceOf(ResourceNotFoundException);
-    expect(mockDataSource.transaction).not.toHaveBeenCalled();
+    expect(repo.softDeleteWithTeams).not.toHaveBeenCalled();
   });
 
-  it('soft-deletes trainer and cascades to teams in a single transaction', async () => {
+  it('delegates cascading soft delete to the trainer repository', async () => {
     repo.findById.mockResolvedValue(makeTrainer());
 
     await useCase.execute('id-1');
 
-    expect(mockDataSource.transaction).toHaveBeenCalledTimes(1);
-    expect(mockManager.query).toHaveBeenCalledTimes(2);
-    expect(mockManager.query).toHaveBeenNthCalledWith(
-      1,
-      expect.stringContaining('UPDATE teams'),
-      expect.arrayContaining(['id-1']),
-    );
-    expect(mockManager.query).toHaveBeenNthCalledWith(
-      2,
-      expect.stringContaining('UPDATE trainers'),
-      expect.arrayContaining(['id-1']),
-    );
+    expect(repo.softDeleteWithTeams).toHaveBeenCalledWith('id-1');
   });
 });
