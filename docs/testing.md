@@ -29,10 +29,10 @@ Cada suite limpa suas tabelas no `beforeEach` via `DELETE FROM` (dentro do schem
 
 | Suite | Testes |
 |-------|--------|
-| Unit | 51 |
+| Unit | 60 |
 | Integration | 13 |
 | E2E | 33 |
-| **Total** | **97** |
+| **Total** | **106** |
 
 ---
 
@@ -136,8 +136,16 @@ Cada suite limpa suas tabelas no `beforeEach` via `DELETE FROM` (dentro do schem
 |-------|-------------|
 | throws ResourceNotFoundException when team does not exist | Rejeita análise de time inexistente |
 | returns correct weaknesses, resistances, and immunities for electric type | Calcula fraquezas, resistências e imunidades corretamente para tipo elétrico |
-| fetches type from PokéAPI when not in local cache | Busca efetividade de tipo na PokéAPI quando não está em cache |
-| uses stale cache when PokéAPI is unavailable | Usa cache stale como fallback quando a PokéAPI está indisponível |
+| skips types for which getOrFetchType returns null | Ignora tipos cujo `GetOrFetchTypeUseCase` retorne `null` (PokéAPI indisponível e sem cache) |
+
+### `GetOrFetchTypeUseCase`
+| Teste | O que valida |
+|-------|-------------|
+| returns cached relations when fresh | Retorna relações locais sem chamar a PokéAPI quando o TTL é válido |
+| fetches from PokéAPI when cache is missing | Busca na PokéAPI e persiste localmente quando não há cache |
+| fetches from PokéAPI when cache is stale | Re-busca na PokéAPI quando o TTL expirou |
+| returns stale cache when PokéAPI is unavailable | Retorna dado expirado com warning quando a PokéAPI está fora do ar |
+| returns null when PokéAPI is unavailable and no cache exists | Retorna `null` quando a PokéAPI falha e não há nenhum cache local |
 
 ### `GetOrFetchPokemonUseCase`
 | Teste | O que valida |

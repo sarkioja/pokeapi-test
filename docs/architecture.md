@@ -39,10 +39,11 @@ src/
 │   ├── ports/
 │   │   ├── pokeapi.port.ts              # Interface para PokéAPI
 │   │   └── viacep.port.ts               # Interface para ViaCEP
+│   ├── di/tokens.ts                     # Tokens de ports de domínio (repositórios e ports externos)
 │   └── exceptions/                      # Hierarquia de erros pura
 │
 ├── application/                   # Use cases — orquestram domínio e ports
-│   ├── di/tokens.ts                # Tokens de composição, fora do Domain
+│   ├── di/tokens.ts                # Tokens de ports de aplicação (LoggerPort, PokemonCacheConfig)
 │   ├── ports/                      # Ports transversais de aplicação
 │   ├── trainer/use-cases/
 │   ├── team/use-cases/
@@ -121,6 +122,7 @@ flowchart TD
         ATA[AnalyzeTeamTypesUseCase]
 
         GOP[GetOrFetchPokemonUseCase]
+        GOT[GetOrFetchTypeUseCase]
         LP[ListPokemonUseCase]
     end
 
@@ -158,7 +160,9 @@ flowchart TD
     CTE & GetTE & UTE & DTE & ATA --> TMP
     APT & RPT --> TMP
     APT & GOP & LP --> PP
-    ATA --> PAP
+    ATA --> GOT
+    GOT --> PAP
+    GOT --> PP
 
     TRP -.-> TORM
     TMP -.-> TEORM
